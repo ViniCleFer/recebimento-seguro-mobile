@@ -1,10 +1,38 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { Card } from '@/components/Card';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
-import { router } from 'expo-router';
+
+import { colors } from '@/styles/theme';
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    marginBottom: 18,
+    minHeight: 68,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    elevation: 0,
+    shadowColor: colors.transparent,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  cardText: {
+    fontSize: 17,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+    color: colors.gray900,
+  },
+});
 
 export default function SelectFormType() {
   const { navigate } = router;
@@ -26,62 +54,49 @@ export default function SelectFormType() {
   }, [navigate]);
 
   return (
-    <ScrollScreenContainer subtitle="Selecione o tipo de formulário para cadastro">
-      <TouchableOpacity onPress={handleCreateFormPtp}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="add-business" size={30} color="#084077" />
-            <Text style={styles.cardText}>PTP Logístico</Text>
-          </View>
-        </Card>
+    <ScrollScreenContainer subtitle="Selecione o tipo de formulário">
+      <TouchableOpacity
+        onPress={handleCreateFormPtp}
+        style={styles.card}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="add-business" size={30} color="#084077" />
+          <Text style={styles.cardText}>PTP Logístico</Text>
+        </View>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleCreateDivergencia}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="add-chart" size={30} color="#084077" />
-            <Text style={styles.cardText}>Divergência</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        onPress={handleCreateDivergencia}
+        style={styles.card}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="add-chart" size={30} color="#084077" />
+          <Text style={styles.cardText}>Divergência</Text>
+        </View>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={handleCreateCartaControle}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="post-add" size={30} color="#084077" />
-            <Text style={styles.cardText}>Carta Controle</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        onPress={handleCreateCartaControle}
+        style={styles.card}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="post-add" size={30} color="#084077" />
+          <Text style={styles.cardText}>Carta Controle</Text>
+        </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={handleCreateLaudoCrm}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="post-add" size={30} color="#084077" />
-            <Text style={styles.cardText}>Laudo CRM</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        onPress={handleCreateLaudoCrm}
+        style={styles.card}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="post-add" size={30} color="#084077" />
+          <Text style={styles.cardText}>Laudo CRM</Text>
+        </View>
       </TouchableOpacity>
     </ScrollScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    marginTop: 8,
-    marginBottom: 12,
-    height: 80,
-    justifyContent: 'center',
-    padding: 12,
-  },
-  cardContent: {
-    backgroundColor: 'white',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  cardText: {
-    color: '#6B7280',
-    fontSize: 18,
-  },
-});

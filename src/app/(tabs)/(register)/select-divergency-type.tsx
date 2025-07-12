@@ -3,8 +3,36 @@ import { router } from 'expo-router';
 import { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { Card } from '@/components/Card';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
+
+import { colors } from '@/styles/theme';
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    marginBottom: 18,
+    minHeight: 68,
+    justifyContent: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    elevation: 0,
+    shadowColor: colors.transparent,
+  },
+  cardContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  cardText: {
+    fontSize: 17,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+    color: colors.gray900,
+  },
+});
 
 export default function SelectDivergencyType() {
   const { navigate } = router;
@@ -18,56 +46,36 @@ export default function SelectDivergencyType() {
 
   return (
     <ScrollScreenContainer subtitle="Selecione o tipo de Divergência">
-      <TouchableOpacity onPress={() => handleDivergency('falta')}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="warning" size={30} color="#084077" />
-            <Text style={styles.cardText}>Falta</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => handleDivergency('falta')}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="warning" size={30} color="#084077" />
+          <Text style={styles.cardText}>Falta</Text>
+        </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleDivergency('sobra')}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="add" size={30} color="#084077" />
-            <Text style={styles.cardText}>Sobra</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => handleDivergency('sobra')}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="add" size={30} color="#084077" />
+          <Text style={styles.cardText}>Sobra</Text>
+        </View>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => handleDivergency('inversa')}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="warning" size={30} color="#084077" />
-            <Text style={styles.cardText}>Inversão</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={() => handleDivergency('inversa')}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="warning" size={30} color="#084077" />
+          <Text style={styles.cardText}>Inversão</Text>
+        </View>
       </TouchableOpacity>
     </ScrollScreenContainer>
   );
 }
-
-const styles = StyleSheet.create({
-  card: {
-    marginBottom: 20,
-    borderRadius: 12,
-    elevation: 2,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  cardText: {
-    fontSize: 18,
-    color: '#084077',
-    fontWeight: '600',
-    marginLeft: 12,
-  },
-});

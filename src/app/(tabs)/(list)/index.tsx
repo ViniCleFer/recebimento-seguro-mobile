@@ -1,29 +1,36 @@
 import { MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useCallback } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-import { Card } from '@/components/Card';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
-import { router } from 'expo-router';
+
+import { colors } from '@/styles/theme';
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: 'white',
-    marginTop: 8,
-    marginBottom: 12,
-    height: 80,
+    backgroundColor: colors.white,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: colors.gray300,
+    marginBottom: 18,
+    minHeight: 68,
     justifyContent: 'center',
-    padding: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    elevation: 0,
+    shadowColor: colors.transparent,
   },
   cardContent: {
-    backgroundColor: 'white',
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: 14,
   },
   cardText: {
-    color: '#6B7280',
-    fontSize: 18,
+    fontSize: 17,
+    fontWeight: '500',
+    letterSpacing: 0.2,
+    color: colors.gray900,
   },
 });
 
@@ -48,40 +55,45 @@ export default function SelectFormType() {
 
   return (
     <ScrollScreenContainer subtitle="Selecione o evento para listagem">
-      <TouchableOpacity onPress={handleListFormPtp}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="receipt-long" size={30} color="#084077" />
-            <Text style={styles.cardText}>PTP Logístico</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={handleListFormPtp}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="receipt-long" size={28} color={colors.primary} />
+          <Text style={styles.cardText}>PTP Logístico</Text>
+        </View>
       </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleListLaudoCrm}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="note-alt" size={30} color="#084077" />
-            <Text style={styles.cardText}>Laudo CRM</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={handleListLaudoCrm}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="note-alt" size={28} color={colors.primary} />
+          <Text style={styles.cardText}>Laudo CRM</Text>
+        </View>
       </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleListDivergencia}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="difference" size={30} color="#084077" />
-            <Text style={styles.cardText}>Divergência</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={handleListDivergencia}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="difference" size={28} color={colors.primary} />
+          <Text style={styles.cardText}>Divergência</Text>
+        </View>
       </TouchableOpacity>
-
-      <TouchableOpacity onPress={handleListCartaControle}>
-        <Card style={styles.card}>
-          <View style={styles.cardContent}>
-            <MaterialIcons name="list-alt" size={30} color="#084077" />
-            <Text style={styles.cardText}>Carta Controle</Text>
-          </View>
-        </Card>
+      <TouchableOpacity
+        style={styles.card}
+        onPress={handleListCartaControle}
+        activeOpacity={0.7}
+      >
+        <View style={styles.cardContent}>
+          <MaterialIcons name="list-alt" size={28} color={colors.primary} />
+          <Text style={styles.cardText}>Carta Controle</Text>
+        </View>
       </TouchableOpacity>
     </ScrollScreenContainer>
   );

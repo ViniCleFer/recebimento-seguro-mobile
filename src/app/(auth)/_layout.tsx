@@ -1,34 +1,16 @@
+import '@/lib/dayjs';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
-import '@/lib/dayjs';
 
 import { supabase } from '@/lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import { FontAwesome } from '@expo/vector-icons';
-import * as Font from 'expo-font';
-import { Redirect, router, Stack, useRouter, useSegments } from 'expo-router';
-import { useEffect, useState, useCallback } from 'react';
-import * as SplashScreen from 'expo-splash-screen';
-import { LogBox, ActivityIndicator, AppState, Alert } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NativeBaseProvider, StatusBar, View } from 'native-base';
-import { THEME } from '@/styles/theme';
-import { Loading } from '@/components/Loading';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import useAuthStore from '@/store/auth';
+import { Session } from '@supabase/supabase-js';
+import { Redirect, Stack } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Alert } from 'react-native';
 
 export default function MainLayout() {
-  // const [fontsLoaded, setFontsLoaded] = useState(false);
-  // const [loading, setLoading] = useState(false);
-
-  // const { session, initialized } = useAuth();
-
-  // const segments = useSegments();
-  // const router = useRouter();
-  const [appIsReady, setAppIsReady] = useState(false);
-  const [loading, setLoading] = useState(true);
   const { user } = useAuthStore(state => state);
-
   const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {

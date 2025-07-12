@@ -1,7 +1,9 @@
-import { useState } from 'react';
-import { Checkbox, Text, View } from 'native-base';
+import { colors } from '@/styles/theme';
 import { tiposNaoConformidade } from '@/utils/tiposNaoConformidade';
+import Icon from '@expo/vector-icons/MaterialCommunityIcons';
+import React, { useState } from 'react';
 import { Control, Controller } from 'react-hook-form';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 interface ConformidadesCheckboxControlledProps {
   label: string;
@@ -22,33 +24,6 @@ export const ConformidadesCheckboxControlled = ({
   optionNaoConformidadesList,
   isChecked = false,
 }: ConformidadesCheckboxControlledProps) => {
-  // const handleCheckbox = (
-  //   naoConformidade: string,
-  //   value: any,
-  //   onChange: any,
-  // ) => {
-  //   const existsNaoConformidadeSelecionada = value.some(
-  //     d => d === naoConformidade,
-  //   );
-
-  //   if (existsNaoConformidadeSelecionada) {
-  //     const indexNaoConformidade = value.findIndex(d => d === naoConformidade);
-
-  //     console.log('indexNaoConformidade', indexNaoConformidade);
-
-  //     setListaNaoConformidades(prevState => {
-  //       const newState = [...prevState];
-  //       newState.splice(indexNaoConformidade, 1);
-  //       return newState;
-  //     });
-  //   } else {
-  //     setListaNaoConformidades(prevState => [
-  //       ...prevState,
-  //       { naoConformidade },
-  //     ]);
-  //   }
-  // };
-
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
   const handleCheckboxChange = (value: string, onChange: any) => {
@@ -65,47 +40,55 @@ export const ConformidadesCheckboxControlled = ({
     });
   };
 
+  const isItemChecked = (value: string) => {
+    return isChecked ? true : selectedItems?.includes(value);
+  };
+
   return (
-    <View>
-      <Text mb={3} color="gray.750">
-        {label}
-      </Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>{label}</Text>
 
       {tiposNaoConformidade
         ?.filter(tipo => optionNaoConformidadesList?.includes(tipo?.value))
         ?.map((item: any) => (
-          <View key={item?.value} mb={4}>
+          <View key={item?.value} style={styles.checkboxContainer}>
             <Controller
               control={control}
               name={`respostas.${index}.${name}`}
               render={({ field }) => (
-                <Checkbox
-                  value={field?.value}
-                  isChecked={
-                    isChecked
-                      ? true
-                      : isOnlyView
-                      ? selectedItems?.includes(item?.value)
-                      : undefined
+                <TouchableOpacity
+                  style={styles.checkboxRow}
+                  activeOpacity={0.7}
+                  onPress={() =>
+                    handleCheckboxChange(item?.value, field.onChange)
                   }
-                  _text={{
-                    color: 'gray.750',
-                  }}
-                  onChange={() => {
-                    handleCheckboxChange(item?.value, field.onChange);
-                    // field.onChange(selectedItems);
-                  }}
-                  isDisabled={isChecked ? true : isOnlyView}
-                  _checked={{
-                    backgroundColor: 'primary.700',
-                    borderColor: 'primary.700',
-                  }}
-                  _disabled={{
-                    opacity: 1,
-                  }}
+                  disabled={isChecked ? true : isOnlyView}
                 >
-                  {item?.label}
-                </Checkbox>
+                  <View
+                    style={[
+                      styles.checkbox,
+                      isItemChecked(item?.value) && styles.checkboxChecked,
+                      (isChecked || isOnlyView) && styles.checkboxDisabled,
+                    ]}
+                  >
+                    {isItemChecked(item?.value) && (
+                      <Icon
+                        name="check"
+                        color={colors.white}
+                        size={24}
+                        style={styles.checkboxInner}
+                      />
+                    )}
+                  </View>
+                  <Text
+                    style={[
+                      styles.checkboxText,
+                      (isChecked || isOnlyView) && styles.checkboxTextDisabled,
+                    ]}
+                  >
+                    {item?.label}
+                  </Text>
+                </TouchableOpacity>
               )}
             />
           </View>
@@ -113,3 +96,55 @@ export const ConformidadesCheckboxControlled = ({
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    marginVertical: 8,
+  },
+  label: {
+    marginBottom: 12,
+    color: colors.gray750,
+    fontSize: 14,
+  },
+  checkboxContainer: {
+    marginBottom: 16,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 20,
+    height: 20,
+    borderWidth: 2,
+    borderColor: '#ccc',
+    borderRadius: 4,
+    marginRight: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  checkboxChecked: {
+    backgroundColor: '#084077',
+    borderColor: '#084077',
+  },
+  checkboxDisabled: {
+    opacity: 1,
+  },
+  checkboxInner: {
+    zIndex: 999,
+    position: 'absolute',
+    justifyContent: 'center',
+    alignItems: 'center',
+    left: -2,
+    bottom: -3,
+  },
+  checkboxText: {
+    color: colors.gray750,
+    fontSize: 14,
+    flex: 1,
+  },
+  checkboxTextDisabled: {
+    opacity: 1,
+  },
+});

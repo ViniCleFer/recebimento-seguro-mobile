@@ -1,9 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigation } from '@react-navigation/native';
-import { Box, Image, Link, VStack } from 'native-base';
 import { useCallback, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert } from 'react-native';
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { z } from 'zod';
 
 import Logo from '@/assets/icon-vfcode.png';
@@ -65,15 +71,7 @@ export default function ForgotPassword() {
   }
 
   return (
-    <VStack
-      alignItems="center"
-      justifyContent="center"
-      zIndex={100}
-      w="100%"
-      px={'8%'}
-      bg="transparent"
-      flex={1}
-    >
+    <View style={styles.container}>
       <Input
         label="E-MAIL"
         name="email"
@@ -84,51 +82,67 @@ export default function ForgotPassword() {
         keyboardType="email-address"
         error={errors.email}
         placeholderTextColor={'#999'}
-        _focus={{ borderColor: 'primary.700' }}
       />
 
       <Button
-        backgroundColor="primary.700"
-        title="Enviar"
-        mt={3}
-        _pressed={{ bg: 'primary.600' }}
-        variant={'solid'}
-        _text={{
-          color: 'white',
-          fontWeight: 'bold',
-        }}
+        title={isLoading ? 'Enviando...' : 'Enviar'}
         onPress={handleSubmit(handleForgotPassword)}
-        isLoading={isLoading}
         disabled={isLoading}
+        style={[styles.sendButton, isLoading && styles.disabledButton]}
       />
 
-      <Link
+      <TouchableOpacity
         onPress={() => {
           router.navigate('/');
         }}
-        alignSelf="center"
-        padding={2}
-        mt={2}
+        style={styles.linkButton}
       >
-        Voltar para o login
-      </Link>
-      <Box
-        height="200px"
-        width="200px"
-        alignItems="center"
-        justifyContent="center"
-        mt={20}
-        borderRadius={10}
-        overflow={'hidden'}
-      >
-        <Image
-          alt="logo ehs"
-          source={Logo}
-          defaultSource={Logo}
-          height={'100%'}
-          resizeMode="contain"
-        />
-      </Box>
-    </VStack>
+        <Text style={styles.linkText}>Voltar para o login</Text>
+      </TouchableOpacity>
+
+      <View style={styles.logoContainer}>
+        <Image source={Logo} style={styles.logo} resizeMode="contain" />
+      </View>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: '8%',
+    backgroundColor: 'transparent',
+    zIndex: 100,
+    width: '100%',
+  },
+  sendButton: {
+    marginTop: 12,
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  linkButton: {
+    alignSelf: 'center',
+    padding: 8,
+    marginTop: 8,
+  },
+  linkText: {
+    color: '#3B82F6',
+    fontSize: 16,
+  },
+  logoContainer: {
+    height: 200,
+    width: 200,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 80,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  logo: {
+    height: '100%',
+    width: '100%',
+  },
+});

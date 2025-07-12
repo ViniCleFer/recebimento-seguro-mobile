@@ -1,28 +1,28 @@
 import { MaterialIcons } from '@expo/vector-icons';
-import { useNavigation, useNavigationState } from '@react-navigation/native';
-import {
-  HStack,
-  type IContainerProps,
-  Image,
-  Pressable,
-  Select,
-  Text,
-  useTheme,
-  VStack,
-} from 'native-base';
+import { useNavigationState } from '@react-navigation/native';
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Platform, useWindowDimensions } from 'react-native';
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+  type ViewProps,
+} from 'react-native';
 
 // import LogoYpe from '@/assets/ype.png';
-import useAuthStore from '@/store/auth';
 import { supabase } from '@/lib/supabase';
+import useAuthStore from '@/store/auth';
 import { useRouter } from 'expo-router';
 // import useFactoryPlantStore from '../../store/factories';
 
-interface HeaderProps extends IContainerProps {}
+interface HeaderProps extends ViewProps {
+  zIndex?: number;
+}
 
-export const Header = ({ ...rest }: HeaderProps) => {
-  const { colors } = useTheme();
+export const Header = ({ zIndex = 1, style, ...rest }: HeaderProps) => {
   const navigationState = useNavigationState(state => state);
 
   const { width } = useWindowDimensions();
@@ -31,20 +31,7 @@ export const Header = ({ ...rest }: HeaderProps) => {
 
   const { user, setUserAuthenticated } = useAuthStore(state => state);
 
-  // const factoriesPlant = useFactoryPlantStore(state => state.factoriesPlant);
-  // const setFactoriesPlant = useFactoryPlantStore(
-  //   state => state.setFactoriesPlant,
-  // );
-  // const selectedFactoryPlant = useFactoryPlantStore(
-  //   state => state.selectedFactoryPlant,
-  // );
-  // const setSelectedFactoryPlant = useFactoryPlantStore(
-  //   state => state.setSelectedFactoryPlant,
-  // );
-
   const [hasNavigation, setHasNavigation] = useState(false);
-
-  // console.log('user', JSON.stringify(name, null, 2));
 
   useEffect(() => {
     if (navigationState && navigationState?.index > 0) {
@@ -53,37 +40,6 @@ export const Header = ({ ...rest }: HeaderProps) => {
       setHasNavigation(false);
     }
   }, [navigationState]);
-
-  // const loadFactories = useCallback(() => {
-  //   getFactoryPlantsRequest().then(response => {
-  //     setFactoriesPlant(response);
-
-  //     if (response && response?.length === 1) {
-  //       setSelectedFactoryPlant(response[0]);
-  //     }
-  //   });
-  // }, [setFactoriesPlant, setSelectedFactoryPlant]);
-
-  // useEffect(() => {
-  //   if (user) {
-  //     loadFactories();
-  //   }
-  // }, [user, loadFactories]);
-
-  // const handleFactoryPlantChange = useCallback(
-  //   (value: string) => {
-  //     const factory = factoriesPlant?.find(
-  //       factoryPlant => factoryPlant.idSite === Number(value),
-  //     );
-
-  //     if (!factory) {
-  //       return '';
-  //     }
-
-  //     setSelectedFactoryPlant(factory);
-  //   },
-  //   [factoriesPlant, setSelectedFactoryPlant],
-  // );
 
   const signOut = useCallback(async () => {
     const { error } = await supabase.auth.signOut();
@@ -97,62 +53,38 @@ export const Header = ({ ...rest }: HeaderProps) => {
 
     setUserAuthenticated(null, null);
     router.replace('/(auth)');
-  }, [supabase, router, setUserAuthenticated]);
-
-  // const update = useCallback(async () => {
-  //   const data = {
-  //     name: 'Vinicius Fernandes',
-  //   };
-
-  //   const { data: responseData, error } = await supabase.auth.updateUser({
-  //     data,
-  //   });
-
-  //   console.log('responseData', JSON.stringify(responseData, null, 2));
-
-  //   // if (error) {
-  //   //   Alert.alert('Erro ao sair', 'Por favor, tente novamente mais tarde');
-
-  //   //   console.error('Error logging out:', error.message);
-  //   //   return;
-  //   // }
-  // }, [supabase]);
+  }, [router, setUserAuthenticated]);
 
   return (
-    <HStack
-      bg={colors.white}
-      pl={'14px'}
-      pr={'12px'}
-      // pb={hasNavigation ? 0 : Platform.OS === 'android' ? 0 : '4px'}
-      width={width}
-      maxW={width}
-      // justifyContent={hasNavigation ? 'space-between' : 'flex-start'}
-      justifyContent={'space-between'}
-      alignItems="center"
-      pt={Platform.OS === 'android' ? '36px' : '70px'}
-      // shadow="8"
+    <View
+      style={[
+        styles.container,
+        {
+          width: width,
+          maxWidth: width,
+          zIndex: zIndex,
+          paddingTop: Platform.OS === 'android' ? 36 : 70,
+        },
+        style,
+      ]}
       {...rest}
     >
-      <HStack alignItems="center">
+      <View style={styles.leftSection}>
         {hasNavigation && (
-          <Pressable
-            p={1}
-            display="flex"
-            borderRadius={4}
-            justifyContent="center"
-            alignItems="center"
+          <TouchableOpacity
+            style={styles.backButton}
             onPress={() => router.back()}
           >
             <MaterialIcons
               name={'arrow-back-ios'}
               size={20}
-              color={colors.gray[500]}
+              color={'#bdbdbd'}
             />
-          </Pressable>
+          </TouchableOpacity>
         )}
 
         {hasNavigation ? (
-          <Text fontSize="xl" fontWeight="medium" textTransform="capitalize">
+          <Text style={styles.userName}>
             {user?.user_metadata?.name
               ? user?.user_metadata?.name?.split(' ')?.length > 2
                 ? user?.user_metadata?.name?.split(' ')[0]
@@ -160,18 +92,19 @@ export const Header = ({ ...rest }: HeaderProps) => {
               : 'Admin'}
           </Text>
         ) : (
-          <VStack width="75%">
-            <Text fontSize="xl" fontWeight="medium" textTransform="capitalize">
+          <View style={styles.userSection}>
+            <Text style={styles.userName}>
               {user?.user_metadata?.name
                 ? user?.user_metadata?.name?.split(' ')?.length > 2
                   ? user?.user_metadata?.name?.split(' ')[0]
                   : user?.user_metadata?.name
                 : 'Admin'}
             </Text>
-          </VStack>
+          </View>
         )}
-      </HStack>
-      <HStack alignItems="center" space={2}>
+      </View>
+
+      <View style={styles.rightSection}>
         {/* <Image
           mb={0.5}
           ml={-3}
@@ -183,16 +116,52 @@ export const Header = ({ ...rest }: HeaderProps) => {
           resizeMode="contain"
           alt="logo"
         /> */}
-      </HStack>
-      <Pressable
-        p={1}
-        borderRadius={4}
-        justifyContent="center"
-        position="relative"
-        onPress={signOut}
-      >
-        <MaterialIcons name="logout" color={colors.primary[700]} size={28} />
-      </Pressable>
-    </HStack>
+      </View>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
+        <MaterialIcons name="logout" color={'#084077'} size={28} />
+      </TouchableOpacity>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: 'white',
+    paddingLeft: 14,
+    paddingRight: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  leftSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  backButton: {
+    padding: 4,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  userName: {
+    fontSize: 18,
+    fontWeight: '500',
+    textTransform: 'capitalize',
+  },
+  userSection: {
+    width: '75%',
+  },
+  rightSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  logoutButton: {
+    padding: 4,
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

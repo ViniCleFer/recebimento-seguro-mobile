@@ -1,62 +1,86 @@
+import React from 'react';
 import {
-  Box,
-  type IScrollViewProps,
+  Dimensions,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
+  StyleSheet,
   Text,
-  VStack,
-} from 'native-base';
-import { Dimensions } from 'react-native';
+  View,
+  type ScrollViewProps,
+} from 'react-native';
 
 import { Header } from '../Header';
 
-type ContainerProps = IScrollViewProps & {
+type ContainerProps = ScrollViewProps & {
   subtitle?: string;
 };
 
 export const ScrollScreenContainer = ({
   children,
   subtitle = '',
+  style,
   ...rest
 }: ContainerProps) => {
   const { width } = Dimensions.get('window');
 
-  // const navigation = useNavigation();
-
   return (
-    <VStack flex={1} maxW={width} bg="white" {...rest}>
-      <Header zIndex={subtitle ? 0 : 999} />
-      {/* {subtitle && (
-        <Box
-          bg="primary.700"
-          p={1}
-          shadow="5"
-          zIndex={999}
-          height={'50px'}
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Text
-            color="white"
-            fontWeight="bold"
-            fontSize="lg"
-            textAlign="center"
-          >
-            {subtitle}
-          </Text>
-        </Box>
-      )} */}
-      <ScrollView
-        flex={1}
-        _contentContainerStyle={{
-          backgroundColor: 'white',
-          padding: '10px',
-          maxW: width,
-        }}
-        {...rest}
+    <View style={[styles.container, { maxWidth: width }, style]} {...rest}>
+      <Header />
+      {subtitle && (
+        <View style={styles.subtitleContainer}>
+          <Text style={styles.subtitleText}>{subtitle}</Text>
+        </View>
+      )}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
       >
-        {children}
-      </ScrollView>
-      {/* <CustomBottomTab navigation={navigation} /> */}
-    </VStack>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={[styles.contentContainer, { maxWidth: width }]}
+          {...rest}
+        >
+          {children}
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  subtitleContainer: {
+    backgroundColor: '#084077',
+    padding: 4,
+    height: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 999,
+  },
+  subtitleText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    backgroundColor: 'white',
+    padding: 10,
+  },
+});

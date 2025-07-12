@@ -1,11 +1,26 @@
-import { type IContainerProps, VStack } from 'native-base';
+import React from 'react';
+import { StyleSheet, View, type ViewProps } from 'react-native';
 
-type ContainerProps = IContainerProps;
-
-export const Card = ({ children, ...rest }: ContainerProps) => {
+export const Card = ({ children, style, ...rest }: ViewProps) => {
   return (
-    <VStack p={5} borderRadius={8} shadow="8" bg="white" {...rest}>
+    <View style={[styles.card, style]} {...rest}>
       {children}
-    </VStack>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    padding: 20,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+});

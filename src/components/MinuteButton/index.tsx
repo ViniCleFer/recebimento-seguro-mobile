@@ -1,46 +1,93 @@
-import { Box, Button, type IButtonProps, Spinner, Text } from 'native-base';
+import { colors } from '@/styles/theme';
 import React from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+  type TouchableOpacityProps,
+} from 'react-native';
 
-type MinuteButtonProps = IButtonProps & {
+type MinuteButtonProps = TouchableOpacityProps & {
   status: 'loading' | 'signed' | 'unsigned';
 };
 
 export const MinuteButton = ({
   status = 'loading',
+  style,
   ...rest
 }: MinuteButtonProps) => {
+  const getButtonStyle = () => {
+    switch (status) {
+      case 'unsigned':
+        return [styles.button, styles.solidButton];
+      case 'signed':
+        return [styles.button, styles.outlineButton, styles.signedButton];
+      default:
+        return [styles.button, styles.outlineButton];
+    }
+  };
+
   return (
-    <Button
-      variant={status === 'unsigned' ? 'solid' : 'outline'}
-      bg={status === 'unsigned' ? 'primary.700' : 'white'}
-      borderColor={status === 'signed' ? 'green.700' : 'primary.700'}
-      borderWidth={1}
-      minW="210px"
-      minH={10}
+    <TouchableOpacity
+      style={[...getButtonStyle(), style]}
       disabled={status === 'signed' || status === 'loading'}
-      _pressed={{
-        backgroundColor: 'primary.900',
-      }}
       {...rest}
     >
       {status === 'loading' && (
-        <Box display="flex" alignItems="center" flexDir="row">
-          <Text fontSize="sm" color="primary.700" mr={2}>
-            VERIFICANDO ASSINATURA
-          </Text>
-          <Spinner color="primary.700" size="sm" />
-        </Box>
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>VERIFICANDO ASSINATURA</Text>
+          <ActivityIndicator size="small" color={colors.primary} />
+        </View>
       )}
       {status === 'signed' && (
-        <Text fontSize="sm" color="green.700">
-          DOCUMENTO ASSINADO
-        </Text>
+        <Text style={styles.signedText}>DOCUMENTO ASSINADO</Text>
       )}
       {status === 'unsigned' && (
-        <Text fontSize="sm" color="white">
-          ASSINAR DOCUMENTO
-        </Text>
+        <Text style={styles.unsignedText}>ASSINAR DOCUMENTO</Text>
       )}
-    </Button>
+    </TouchableOpacity>
   );
 };
+
+const styles = StyleSheet.create({
+  button: {
+    minWidth: 210,
+    minHeight: 40,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  solidButton: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  outlineButton: {
+    backgroundColor: colors.white,
+    borderColor: colors.primary,
+  },
+  signedButton: {
+    borderColor: colors.success,
+  },
+  loadingContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: colors.primary,
+  },
+  signedText: {
+    fontSize: 14,
+    color: colors.success,
+  },
+  unsignedText: {
+    fontSize: 14,
+    color: colors.white,
+  },
+});

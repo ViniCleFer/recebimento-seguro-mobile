@@ -1,13 +1,12 @@
-import { useCallback } from 'react';
-import { router } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import { HStack, Pressable, Text, useTheme } from 'native-base';
+import { router } from 'expo-router';
+import { useCallback } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Card } from '@/components/Card';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
 
 export default function SelectDivergencyType() {
-  const { colors } = useTheme();
   const { navigate } = router;
 
   const handleSpecification = useCallback(
@@ -19,69 +18,53 @@ export default function SelectDivergencyType() {
 
   return (
     <ScrollScreenContainer subtitle="Selecione o tipo de Especificação">
-      <Pressable onPress={() => handleSpecification('armazenamento')}>
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="storage"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              Armazenamento
-            </Text>
-          </HStack>
+      <TouchableOpacity onPress={() => handleSpecification('armazenamento')}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="storage" size={30} color="#084077" />
+            <Text style={styles.cardText}>Armazenamento</Text>
+          </View>
         </Card>
-      </Pressable>
-      <Pressable onPress={() => handleSpecification('recebimento')}>
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="receipt"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              Recebimento
-            </Text>
-          </HStack>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleSpecification('recebimento')}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="receipt" size={30} color="#084077" />
+            <Text style={styles.cardText}>Recebimento</Text>
+          </View>
         </Card>
-      </Pressable>
-      <Pressable onPress={() => handleSpecification('separacao')}>
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="dataset"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              Separação e Montagem
-            </Text>
-          </HStack>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={() => handleSpecification('separacao')}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="dataset" size={30} color="#084077" />
+            <Text style={styles.cardText}>Separação e Montagem</Text>
+          </View>
         </Card>
-      </Pressable>
+      </TouchableOpacity>
     </ScrollScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: 'white',
+    marginTop: 8,
+    marginBottom: 12,
+    height: 80,
+    justifyContent: 'center',
+    padding: 12,
+  },
+  cardContent: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  cardText: {
+    color: '#6B7280',
+    fontSize: 18,
+  },
+});

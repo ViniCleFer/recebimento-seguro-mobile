@@ -1,4 +1,6 @@
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
+import { StackActions } from '@react-navigation/native';
+import { decode } from 'base64-arraybuffer';
 import dayjs from 'dayjs';
 import {
   type CameraPictureOptions,
@@ -6,39 +8,31 @@ import {
   useCameraPermissions,
 } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
-import mime from 'mime';
-import {
-  Box,
-  HStack,
-  Icon,
-  Image,
-  Input,
-  Pressable,
-  Select,
-  Text,
-  useTheme,
-  View,
-  VStack,
-} from 'native-base';
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
-import { shade } from 'polished';
 import {
   router,
   useLocalSearchParams,
   useNavigationContainerRef,
 } from 'expo-router';
-import { decode, encode } from 'base64-arraybuffer';
-import { StackActions } from '@react-navigation/native';
+import mime from 'mime';
+import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 
-import Title from '@/components/Title';
 import { Button } from '@/components/Button';
 import { Loading } from '@/components/Loading';
-import { SelectWithLabel } from '@/components/SelectWithLabel';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
+import { SelectWithLabel } from '@/components/SelectWithLabel';
+import Title from '@/components/Title';
 
-import { listaTurnos } from '@/utils/listaTurnos';
 import { generateFolderName } from '@/utils/generateFoldername';
+import { listaTurnos } from '@/utils/listaTurnos';
 import { tiposEvidenciaCartaControle } from '@/utils/tiposEvidenciaCartaControle';
 
 import { supabase } from '@/lib/supabase';
@@ -50,8 +44,8 @@ import {
   TipoEvidenciaCartaControle,
 } from '@/services/requests/cartas-controle/types';
 import {
-  updateCartaControleRequest,
   getCartasControleWithEvidencesByIdRequest,
+  updateCartaControleRequest,
   updateEvidenciasCartaControleRequest,
 } from '@/services/requests/cartas-controle/utils';
 import { Turno } from '@/services/requests/laudos/types';
@@ -73,10 +67,103 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 30,
   },
+  loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  captureButton: {
+    backgroundColor: '#fff',
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+  },
+  formContainer: {
+    paddingHorizontal: 8,
+    paddingTop: 8,
+    paddingBottom: 80,
+    gap: 24,
+  },
+  dateContainer: {
+    backgroundColor: '#084077',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  dateContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  dateLabel: {
+    color: 'white',
+    fontWeight: '600',
+  },
+  dateValue: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  inputGroup: {
+    marginBottom: 4,
+  },
+  inputLabel: {
+    marginBottom: -8,
+    color: '#6b7280',
+  },
+  textInput: {
+    width: '100%',
+    height: 56,
+    fontSize: 16,
+    paddingBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d1d5db',
+  },
+  evidenceSection: {
+    marginBottom: 16,
+  },
+  evidenceTitle: {
+    color: '#6b7280',
+    marginBottom: 16,
+  },
+  evidenceList: {
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  evidenceItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+    width: '100%',
+  },
+  evidenceImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 4,
+  },
+  evidenceActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: 24,
+    gap: 20,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginTop: 16,
+  },
 });
 
 export default function CartaControle() {
-  const { colors } = useTheme();
   const { replace, back } = router;
   const rootNavigation = useNavigationContainerRef();
 
@@ -574,34 +661,15 @@ export default function CartaControle() {
 
   return isCameraActive ? (
     <View style={styles.container}>
-      {loadingPreview && (
-        <Loading
-          flex={1}
-          height="100%"
-          position={'absolute'}
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          zIndex={100}
-          backgroundColor={'rgba(000, 000, 000, 0.7)'}
-        />
-      )}
+      {loadingPreview && <Loading style={styles.loadingOverlay} />}
       <CameraView
         ref={cameraRef}
         style={{ flex: 1, flexDirection: 'row' }}
         facing="back"
       >
-        <Box style={styles.takePictureContainer} backgroundColor="transparent">
+        <View style={styles.takePictureContainer}>
           <TouchableOpacity onPress={takePicture}>
-            <Box
-              borderRadius="full"
-              style={{
-                backgroundColor: '#fff',
-                height: 60,
-                width: 60,
-              }}
-            />
+            <View style={styles.captureButton} />
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.closeCamera}
@@ -611,169 +679,103 @@ export default function CartaControle() {
           >
             <MaterialIcons name="cancel" size={40} color="white" />
           </TouchableOpacity>
-        </Box>
+        </View>
       </CameraView>
     </View>
   ) : (
     <Fragment>
-      {isLoading && (
-        <Loading
-          flex={1}
-          height="100%"
-          position={'absolute'}
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          zIndex={100}
-          backgroundColor={'rgba(000, 000, 000, 0.6)'}
-        />
-      )}
+      {isLoading && <Loading style={styles.loadingOverlay} />}
       <ScrollScreenContainer subtitle="Carta Controle">
-        <VStack px={2} space={6} mb="20%" pt={2}>
+        <View style={styles.formContainer}>
           <Title>Carta Controle</Title>
-          <Pressable
-            backgroundColor="primary.700"
-            px={2}
-            py={1}
-            borderRadius={4}
-            shadow={2}
-            disabled
-          >
-            <HStack alignItems="center" justifyContent="space-between">
-              <VStack>
-                <Text color="white" fontWeight="semibold">
-                  Data da identificação
-                </Text>
-                <Text color="white" fontWeight="bold">
+          <TouchableOpacity style={styles.dateContainer} disabled>
+            <View style={styles.dateContent}>
+              <View>
+                <Text style={styles.dateLabel}>Data da identificação</Text>
+                <Text style={styles.dateValue}>
                   {dayjs(dataIdentificacao).format('DD/MM/YYYY')}
                 </Text>
-              </VStack>
+              </View>
               <MaterialCommunityIcons
                 name="calendar"
-                color={colors.white}
+                color="#ffffff"
                 size={28}
               />
-            </HStack>
-          </Pressable>
+            </View>
+          </TouchableOpacity>
 
           <SelectWithLabel
             label="Turno"
-            selectedValue={turno}
+            value={turno}
             onValueChange={setTurno}
-            options={listaTurnos?.map(s => (
-              <Select.Item key={s?.value} label={s?.label} value={s?.value} />
-            ))}
+            options={listaTurnos?.map(s => ({
+              label: s?.label,
+              value: s?.value,
+            }))}
           />
 
-          <Box mb={1}>
-            <Text mb={-2} color="gray.750">
-              Documento de Transporte (DT):
-            </Text>
-            <Input
-              w="full"
-              variant="underlined"
-              height={14}
-              size="md"
-              fontSize="md"
-              pb={0}
-              placeholderTextColor="gray.700"
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Documento de Transporte (DT):</Text>
+            <TextInput
+              style={styles.textInput}
               value={documentoTransporte}
               onChangeText={t => {
                 setDocumentoTransporte(t);
               }}
-              _focus={{ borderColor: 'primary.700' }}
-              autoComplete="off"
               keyboardType="numeric"
               maxLength={7}
             />
-          </Box>
+          </View>
 
-          <Box mb={1}>
-            <Text mb={-2} color="gray.750">
-              Remessa:
-            </Text>
-            <Input
-              w="full"
-              variant="underlined"
-              height={14}
-              size="md"
-              fontSize="md"
-              pb={0}
-              placeholderTextColor="gray.700"
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Remessa:</Text>
+            <TextInput
+              style={styles.textInput}
               value={remessa}
               onChangeText={t => {
                 setRemessa(t);
               }}
-              _focus={{ borderColor: 'primary.700' }}
-              autoComplete="off"
               keyboardType="numeric"
               maxLength={10}
             />
-          </Box>
+          </View>
 
-          <Box mb={1}>
-            <Text mb={-2} color="gray.750">
-              Conferente/Técnico:
-            </Text>
-            <Input
-              w="full"
-              variant="underlined"
-              height={14}
-              size="md"
-              fontSize="md"
-              pb={0}
-              placeholderTextColor="gray.700"
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Conferente/Técnico:</Text>
+            <TextInput
+              style={styles.textInput}
               value={conferente}
               onChangeText={setConferente}
-              _disabled={{
-                color: 'gray.900',
-                opacity: 1,
-                borderColor: 'gray.700',
-              }}
-              _focus={{ borderColor: 'primary.700' }}
-              autoComplete="off"
               maxLength={30}
             />
-          </Box>
+          </View>
 
           <SelectWithLabel
             label="Doca"
-            selectedValue={doca}
+            value={doca}
             onValueChange={setDoca}
-            options={Array.from({ length: 50 })?.map((_, index) => (
-              <Select.Item
-                key={String(index + 1)}
-                label={String(index + 1)}
-                value={String(index + 1)}
-              />
-            ))}
+            options={Array.from({ length: 50 })?.map((_, index) => ({
+              label: String(index + 1),
+              value: String(index + 1),
+            }))}
           />
 
-          <Box mb={1}>
-            <Text mb={-2} color="gray.750">
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>
               Capacidade Veículo (N° Palles):
             </Text>
-            <Input
-              w="full"
-              variant="underlined"
-              height={14}
-              size="md"
-              fontSize="md"
-              pb={0}
-              placeholderTextColor="gray.700"
+            <TextInput
+              style={styles.textInput}
               value={capacidadeVeiculo}
               onChangeText={setCapacidadeVeiculo}
               maxLength={2}
-              _focus={{ borderColor: 'primary.700' }}
               placeholder="00"
-              autoComplete="off"
               keyboardType="numeric"
             />
-          </Box>
+          </View>
 
-          <VStack>
-            <Text color="gray.750" mb={4}>
+          <View style={styles.evidenceSection}>
+            <Text style={styles.evidenceTitle}>
               Evidência(s){' '}
               {
                 tiposEvidenciaCartaControle?.find(
@@ -784,7 +786,7 @@ export default function CartaControle() {
             </Text>
 
             {imagesList && imagesList?.length > 0 && (
-              <VStack mt={1} mb={3}>
+              <View style={styles.evidenceList}>
                 {imagesList
                   ?.filter(
                     img =>
@@ -792,26 +794,13 @@ export default function CartaControle() {
                       TipoEvidenciaCartaControle.ORDEM_CARREGAMENTO,
                   )
                   ?.map((image, index) => (
-                    <HStack
-                      key={index}
-                      space={2}
-                      mb={4}
-                      w="full"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Image
-                          key={index}
-                          source={{ uri: image?.uri }}
-                          alt="image"
-                          size="sm"
-                          width="100px"
-                          height="100px"
-                          borderRadius={4}
-                        />
-                      </HStack>
-                      <Pressable
+                    <View key={index} style={styles.evidenceItem}>
+                      <Image
+                        source={{ uri: image?.uri }}
+                        style={styles.evidenceImage}
+                        resizeMode="cover"
+                      />
+                      <TouchableOpacity
                         onPress={() => {
                           const newImagesList = imagesList?.filter(
                             img => img.id !== image.id,
@@ -822,50 +811,42 @@ export default function CartaControle() {
                       >
                         <MaterialIcons
                           name="delete"
-                          color={colors.secondary[700]}
+                          color="#dc2626"
                           size={24}
                         />
-                      </Pressable>
-                    </HStack>
+                      </TouchableOpacity>
+                    </View>
                   ))}
-              </VStack>
+              </View>
             )}
 
-            <HStack
-              alignItems="center"
-              justifyContent="flex-start"
-              mb="24px"
-              space={5}
-            >
-              <Pressable
+            <View style={styles.evidenceActions}>
+              <TouchableOpacity
                 onPress={() =>
                   handlePhotoLibrary(
                     TipoEvidenciaCartaControle.ORDEM_CARREGAMENTO,
                   )
                 }
               >
-                <MaterialIcons
-                  name="photo"
-                  color={colors.gray[800]}
-                  size={28}
-                />
-              </Pressable>
-              <Pressable
+                <MaterialIcons name="photo" color="#374151" size={28} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   handleCamera(TipoEvidenciaCartaControle.ORDEM_CARREGAMENTO);
                 }}
               >
                 <MaterialCommunityIcons
                   name="camera"
-                  color={colors.gray[800]}
+                  color="#374151"
                   size={28}
                 />
-              </Pressable>
-            </HStack>
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <VStack>
-            <Text color="gray.750" mb={4}>
+          {/* Evidência: Carga na Doca */}
+          <View style={styles.evidenceSection}>
+            <Text style={styles.evidenceTitle}>
               Evidência(s){' '}
               {
                 tiposEvidenciaCartaControle?.find(
@@ -875,32 +856,19 @@ export default function CartaControle() {
             </Text>
 
             {imagesList && imagesList?.length > 0 && (
-              <VStack mt={1} mb={3}>
+              <View style={styles.evidenceList}>
                 {imagesList
                   ?.filter(
                     img => img?.type === TipoEvidenciaCartaControle.CARGA_DOCA,
                   )
                   ?.map((image, index) => (
-                    <HStack
-                      key={index}
-                      space={2}
-                      mb={4}
-                      w="full"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Image
-                          key={index}
-                          source={{ uri: image?.uri }}
-                          alt="image"
-                          size="sm"
-                          width="100px"
-                          height="100px"
-                          borderRadius={4}
-                        />
-                      </HStack>
-                      <Pressable
+                    <View key={index} style={styles.evidenceItem}>
+                      <Image
+                        source={{ uri: image?.uri }}
+                        style={styles.evidenceImage}
+                        resizeMode="cover"
+                      />
+                      <TouchableOpacity
                         onPress={() => {
                           const newImagesList = imagesList?.filter(
                             img => img.id !== image.id,
@@ -911,48 +879,40 @@ export default function CartaControle() {
                       >
                         <MaterialIcons
                           name="delete"
-                          color={colors.secondary[700]}
+                          color="#dc2626"
                           size={24}
                         />
-                      </Pressable>
-                    </HStack>
+                      </TouchableOpacity>
+                    </View>
                   ))}
-              </VStack>
+              </View>
             )}
 
-            <HStack
-              alignItems="center"
-              justifyContent="flex-start"
-              mb="24px"
-              space={5}
-            >
-              <Pressable
+            <View style={styles.evidenceActions}>
+              <TouchableOpacity
                 onPress={() =>
                   handlePhotoLibrary(TipoEvidenciaCartaControle.CARGA_DOCA)
                 }
               >
-                <MaterialIcons
-                  name="photo"
-                  color={colors.gray[800]}
-                  size={28}
-                />
-              </Pressable>
-              <Pressable
+                <MaterialIcons name="photo" color="#374151" size={28} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   handleCamera(TipoEvidenciaCartaControle.CARGA_DOCA);
                 }}
               >
                 <MaterialCommunityIcons
                   name="camera"
-                  color={colors.gray[800]}
+                  color="#374151"
                   size={28}
                 />
-              </Pressable>
-            </HStack>
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <VStack>
-            <Text color="gray.750" mb={4}>
+          {/* Evidência: Início do Carregamento */}
+          <View style={styles.evidenceSection}>
+            <Text style={styles.evidenceTitle}>
               Evidência(s){' '}
               {
                 tiposEvidenciaCartaControle?.find(
@@ -963,7 +923,7 @@ export default function CartaControle() {
             </Text>
 
             {imagesList && imagesList?.length > 0 && (
-              <VStack mt={1} mb={3}>
+              <View style={styles.evidenceList}>
                 {imagesList
                   ?.filter(
                     img =>
@@ -971,26 +931,13 @@ export default function CartaControle() {
                       TipoEvidenciaCartaControle.INICIO_CARREGAMENTO,
                   )
                   ?.map((image, index) => (
-                    <HStack
-                      key={index}
-                      space={2}
-                      mb={4}
-                      w="full"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Image
-                          key={index}
-                          source={{ uri: image?.uri }}
-                          alt="image"
-                          size="sm"
-                          width="100px"
-                          height="100px"
-                          borderRadius={4}
-                        />
-                      </HStack>
-                      <Pressable
+                    <View key={index} style={styles.evidenceItem}>
+                      <Image
+                        source={{ uri: image?.uri }}
+                        style={styles.evidenceImage}
+                        resizeMode="cover"
+                      />
+                      <TouchableOpacity
                         onPress={() => {
                           const newImagesList = imagesList?.filter(
                             img => img.id !== image.id,
@@ -1001,50 +948,42 @@ export default function CartaControle() {
                       >
                         <MaterialIcons
                           name="delete"
-                          color={colors.secondary[700]}
+                          color="#dc2626"
                           size={24}
                         />
-                      </Pressable>
-                    </HStack>
+                      </TouchableOpacity>
+                    </View>
                   ))}
-              </VStack>
+              </View>
             )}
 
-            <HStack
-              alignItems="center"
-              justifyContent="flex-start"
-              mb="24px"
-              space={5}
-            >
-              <Pressable
+            <View style={styles.evidenceActions}>
+              <TouchableOpacity
                 onPress={() =>
                   handlePhotoLibrary(
                     TipoEvidenciaCartaControle.INICIO_CARREGAMENTO,
                   )
                 }
               >
-                <MaterialIcons
-                  name="photo"
-                  color={colors.gray[800]}
-                  size={28}
-                />
-              </Pressable>
-              <Pressable
+                <MaterialIcons name="photo" color="#374151" size={28} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   handleCamera(TipoEvidenciaCartaControle.INICIO_CARREGAMENTO);
                 }}
               >
                 <MaterialCommunityIcons
                   name="camera"
-                  color={colors.gray[800]}
+                  color="#374151"
                   size={28}
                 />
-              </Pressable>
-            </HStack>
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <VStack>
-            <Text color="gray.750" mb={4}>
+          {/* Evidência: Meio do Carregamento */}
+          <View style={styles.evidenceSection}>
+            <Text style={styles.evidenceTitle}>
               Evidência(s){' '}
               {
                 tiposEvidenciaCartaControle?.find(
@@ -1054,7 +993,7 @@ export default function CartaControle() {
             </Text>
 
             {imagesList && imagesList?.length > 0 && (
-              <VStack mt={1} mb={3}>
+              <View style={styles.evidenceList}>
                 {imagesList
                   ?.filter(
                     img =>
@@ -1062,26 +1001,13 @@ export default function CartaControle() {
                       TipoEvidenciaCartaControle.MEIO_CARREGAMENTO,
                   )
                   ?.map((image, index) => (
-                    <HStack
-                      key={index}
-                      space={2}
-                      mb={4}
-                      w="full"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Image
-                          key={index}
-                          source={{ uri: image?.uri }}
-                          alt="image"
-                          size="sm"
-                          width="100px"
-                          height="100px"
-                          borderRadius={4}
-                        />
-                      </HStack>
-                      <Pressable
+                    <View key={index} style={styles.evidenceItem}>
+                      <Image
+                        source={{ uri: image?.uri }}
+                        style={styles.evidenceImage}
+                        resizeMode="cover"
+                      />
+                      <TouchableOpacity
                         onPress={() => {
                           const newImagesList = imagesList?.filter(
                             img => img.id !== image.id,
@@ -1092,50 +1018,42 @@ export default function CartaControle() {
                       >
                         <MaterialIcons
                           name="delete"
-                          color={colors.secondary[700]}
+                          color="#dc2626"
                           size={24}
                         />
-                      </Pressable>
-                    </HStack>
+                      </TouchableOpacity>
+                    </View>
                   ))}
-              </VStack>
+              </View>
             )}
 
-            <HStack
-              alignItems="center"
-              justifyContent="flex-start"
-              mb="24px"
-              space={5}
-            >
-              <Pressable
+            <View style={styles.evidenceActions}>
+              <TouchableOpacity
                 onPress={() =>
                   handlePhotoLibrary(
                     TipoEvidenciaCartaControle.MEIO_CARREGAMENTO,
                   )
                 }
               >
-                <MaterialIcons
-                  name="photo"
-                  color={colors.gray[800]}
-                  size={28}
-                />
-              </Pressable>
-              <Pressable
+                <MaterialIcons name="photo" color="#374151" size={28} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   handleCamera(TipoEvidenciaCartaControle.MEIO_CARREGAMENTO);
                 }}
               >
                 <MaterialCommunityIcons
                   name="camera"
-                  color={colors.gray[800]}
+                  color="#374151"
                   size={28}
                 />
-              </Pressable>
-            </HStack>
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <VStack>
-            <Text color="gray.750" mb={4}>
+          {/* Evidência: Final do Carregamento */}
+          <View style={styles.evidenceSection}>
+            <Text style={styles.evidenceTitle}>
               Evidência(s){' '}
               {
                 tiposEvidenciaCartaControle?.find(
@@ -1146,7 +1064,7 @@ export default function CartaControle() {
             </Text>
 
             {imagesList && imagesList?.length > 0 && (
-              <VStack mt={1} mb={3}>
+              <View style={styles.evidenceList}>
                 {imagesList
                   ?.filter(
                     img =>
@@ -1154,26 +1072,13 @@ export default function CartaControle() {
                       TipoEvidenciaCartaControle.FINAL_CARREGAMENTO,
                   )
                   ?.map((image, index) => (
-                    <HStack
-                      key={index}
-                      space={2}
-                      mb={4}
-                      w="full"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Image
-                          key={index}
-                          source={{ uri: image?.uri }}
-                          alt="image"
-                          size="sm"
-                          width="100px"
-                          height="100px"
-                          borderRadius={4}
-                        />
-                      </HStack>
-                      <Pressable
+                    <View key={index} style={styles.evidenceItem}>
+                      <Image
+                        source={{ uri: image?.uri }}
+                        style={styles.evidenceImage}
+                        resizeMode="cover"
+                      />
+                      <TouchableOpacity
                         onPress={() => {
                           const newImagesList = imagesList?.filter(
                             img => img.id !== image.id,
@@ -1184,50 +1089,42 @@ export default function CartaControle() {
                       >
                         <MaterialIcons
                           name="delete"
-                          color={colors.secondary[700]}
+                          color="#dc2626"
                           size={24}
                         />
-                      </Pressable>
-                    </HStack>
+                      </TouchableOpacity>
+                    </View>
                   ))}
-              </VStack>
+              </View>
             )}
 
-            <HStack
-              alignItems="center"
-              justifyContent="flex-start"
-              mb="24px"
-              space={5}
-            >
-              <Pressable
+            <View style={styles.evidenceActions}>
+              <TouchableOpacity
                 onPress={() =>
                   handlePhotoLibrary(
                     TipoEvidenciaCartaControle.FINAL_CARREGAMENTO,
                   )
                 }
               >
-                <MaterialIcons
-                  name="photo"
-                  color={colors.gray[800]}
-                  size={28}
-                />
-              </Pressable>
-              <Pressable
+                <MaterialIcons name="photo" color="#374151" size={28} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   handleCamera(TipoEvidenciaCartaControle.FINAL_CARREGAMENTO);
                 }}
               >
                 <MaterialCommunityIcons
                   name="camera"
-                  color={colors.gray[800]}
+                  color="#374151"
                   size={28}
                 />
-              </Pressable>
-            </HStack>
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <VStack>
-            <Text color="gray.750" mb={4}>
+          {/* Evidência: Placa do Veículo */}
+          <View style={styles.evidenceSection}>
+            <Text style={styles.evidenceTitle}>
               Evidência(s){' '}
               {
                 tiposEvidenciaCartaControle?.find(
@@ -1237,33 +1134,20 @@ export default function CartaControle() {
             </Text>
 
             {imagesList && imagesList?.length > 0 && (
-              <VStack mt={1} mb={3}>
+              <View style={styles.evidenceList}>
                 {imagesList
                   ?.filter(
                     img =>
                       img?.type === TipoEvidenciaCartaControle.PLACA_VEICULO,
                   )
                   ?.map((image, index) => (
-                    <HStack
-                      key={index}
-                      space={2}
-                      mb={4}
-                      w="full"
-                      justifyContent="space-between"
-                      alignItems="center"
-                    >
-                      <HStack space={2} alignItems="center">
-                        <Image
-                          key={index}
-                          source={{ uri: image?.uri }}
-                          alt="image"
-                          size="sm"
-                          width="100px"
-                          height="100px"
-                          borderRadius={4}
-                        />
-                      </HStack>
-                      <Pressable
+                    <View key={index} style={styles.evidenceItem}>
+                      <Image
+                        source={{ uri: image?.uri }}
+                        style={styles.evidenceImage}
+                        resizeMode="cover"
+                      />
+                      <TouchableOpacity
                         onPress={() => {
                           const newImagesList = imagesList?.filter(
                             img => img.id !== image.id,
@@ -1274,102 +1158,66 @@ export default function CartaControle() {
                       >
                         <MaterialIcons
                           name="delete"
-                          color={colors.secondary[700]}
+                          color="#dc2626"
                           size={24}
                         />
-                      </Pressable>
-                    </HStack>
+                      </TouchableOpacity>
+                    </View>
                   ))}
-              </VStack>
+              </View>
             )}
 
-            <HStack
-              alignItems="center"
-              justifyContent="flex-start"
-              mb="24px"
-              space={5}
-            >
-              <Pressable
+            <View style={styles.evidenceActions}>
+              <TouchableOpacity
                 onPress={() =>
                   handlePhotoLibrary(TipoEvidenciaCartaControle.PLACA_VEICULO)
                 }
               >
-                <MaterialIcons
-                  name="photo"
-                  color={colors.gray[800]}
-                  size={28}
-                />
-              </Pressable>
-              <Pressable
+                <MaterialIcons name="photo" color="#374151" size={28} />
+              </TouchableOpacity>
+              <TouchableOpacity
                 onPress={() => {
                   handleCamera(TipoEvidenciaCartaControle.PLACA_VEICULO);
                 }}
               >
                 <MaterialCommunityIcons
                   name="camera"
-                  color={colors.gray[800]}
+                  color="#374151"
                   size={28}
                 />
-              </Pressable>
-            </HStack>
-          </VStack>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-          <Box mb={1}>
-            <Text mb={-2} color="gray.750">
-              Observações Gerais:
-            </Text>
-            <Input
-              w="full"
-              variant="underlined"
-              minHeight={14}
-              size="md"
-              fontSize="md"
-              pb={0}
-              placeholderTextColor="gray.700"
+          <View style={styles.inputGroup}>
+            <Text style={styles.inputLabel}>Observações Gerais:</Text>
+            <TextInput
+              style={[styles.textInput, { minHeight: 56 }]}
               value={observacoes}
               onChangeText={setObservacoes}
-              _focus={{ borderColor: 'primary.700' }}
-              autoComplete="off"
               multiline
               maxLength={300}
             />
-          </Box>
+          </View>
 
-          <HStack width="100%" justifyContent="space-between" mt={4}>
+          <View style={styles.buttonRow}>
             <Button
-              width="48%"
-              h="50px"
-              backgroundColor="gray.700"
               title="Cancelar"
-              _pressed={{ bg: 'gray.600' }}
-              variant={'solid'}
-              _text={{
-                color: 'white',
-              }}
               onPress={() => {
                 handleCancel();
               }}
               disabled={isLoading}
-              leftIcon={<Icon as={MaterialIcons} name="delete" size="md" />}
+              style={{ width: '48%', backgroundColor: '#374151' }}
             />
 
             <Button
-              width="48%"
-              h="50px"
-              backgroundColor="primary.700"
               title="Salvar"
-              _pressed={{ bg: shade(0.3, '#2e2efe') }}
-              variant={'solid'}
-              _text={{
-                color: 'white',
-              }}
               onPress={handleSaveLaudoCrm}
-              isLoading={isLoading}
               disabled={isLoading || status === 'FINALIZADO'}
-              leftIcon={<Icon as={MaterialIcons} name="save" size="md" />}
+              style={{ width: '48%', backgroundColor: '#084077' }}
             />
-          </HStack>
-        </VStack>
+          </View>
+        </View>
       </ScrollScreenContainer>
     </Fragment>
   );

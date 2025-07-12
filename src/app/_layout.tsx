@@ -1,21 +1,20 @@
+import '@/lib/dayjs';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
-import '@/lib/dayjs';
 
-import { supabase } from '@/lib/supabase';
-import { Session } from '@supabase/supabase-js';
-import { FontAwesome } from '@expo/vector-icons';
-import * as Font from 'expo-font';
-import { router, Slot, Stack, useRouter, useSegments } from 'expo-router';
-import { useEffect, useState, useCallback } from 'react';
+import { AuthProvider } from '@/contexts/AuthContext';
+import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { LogBox, ActivityIndicator, View, Alert } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { NativeBaseProvider, StatusBar } from 'native-base';
-import { THEME } from '@/styles/theme';
-import { Loading } from '@/components/Loading';
-import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import * as Updates from 'expo-updates';
+import { useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  LogBox,
+  StatusBar,
+  View,
+} from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 LogBox.ignoreAllLogs();
 
@@ -45,7 +44,7 @@ export default function RootLayout() {
     try {
       await Updates.fetchUpdateAsync();
       await Updates.reloadAsync();
-    } catch (error) {
+    } catch {
       Alert.alert(
         'Erro ao atualizar',
         'Ocorreu um erro ao tentar atualizar o App. Tente novamente mais tarde',
@@ -98,34 +97,12 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NativeBaseProvider theme={THEME}>
-        <StatusBar
-          backgroundColor="white"
-          barStyle="dark-content"
-          translucent
-        />
-        <View style={{ flex: 1 }}>
-          {/* <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="sign-up" />
-            <Stack.Screen name="forgot-password" />
-            <Stack.Screen name="(auth)/dashboard" />
-            <Stack.Screen name="(auth)/divergency/[type]" />
-            <Stack.Screen name="(auth)/enunciado/[id]" />
-            <Stack.Screen name="(auth)/form-ptp" />
-            <Stack.Screen name="(auth)/forms-ptp-list" />
-            <Stack.Screen name="(auth)/divergencies-list" />
-            <Stack.Screen name="(auth)/laudo-crm/[id]" />
-            <Stack.Screen name="(auth)/laudos-crm-list" />
-            <Stack.Screen name="(auth)/select-divergency-type" />
-            <Stack.Screen name="(auth)/select-form-type-to-list" />
-            <Stack.Screen name="(auth)/select-form-type-to-register" />
-          </Stack> */}
-          <AuthProvider>
-            <Slot />
-          </AuthProvider>
-        </View>
-      </NativeBaseProvider>
+      <StatusBar backgroundColor="white" barStyle="dark-content" translucent />
+      <View style={{ flex: 1 }}>
+        <AuthProvider>
+          <Slot />
+        </AuthProvider>
+      </View>
     </GestureHandlerRootView>
   );
 }

@@ -1,17 +1,17 @@
 import { useNavigation } from '@react-navigation/native';
+import React from 'react';
 import {
-  Box,
-  Container,
-  type IContainerProps,
+  Dimensions,
+  StyleSheet,
   Text,
-  VStack,
-} from 'native-base';
-import { Dimensions } from 'react-native';
+  View,
+  type ViewProps,
+} from 'react-native';
 
 import { CustomBottomTab } from '../CustomBottomTab';
 import { Header } from '../Header';
 
-type ContainerProps = IContainerProps & {
+type ContainerProps = ViewProps & {
   subtitle?: string;
   footerActive?: boolean;
 };
@@ -20,26 +20,62 @@ export const ScreenContainer = ({
   children,
   subtitle = '',
   footerActive = true,
+  style,
   ...rest
 }: ContainerProps) => {
   const { width } = Dimensions.get('window');
-
   const navigation = useNavigation();
 
   return (
-    <VStack flex={1} maxW={width} bg="white" mt={!footerActive ? -100 : 0}>
+    <View
+      style={[
+        styles.container,
+        {
+          maxWidth: width,
+          marginTop: !footerActive ? -100 : 0,
+        },
+        style,
+      ]}
+      {...rest}
+    >
       <Header zIndex={subtitle ? 0 : 999} />
       {subtitle && (
-        <Box bg="primary.700" p={1} shadow="5" zIndex={999}>
-          <Text color="white" fontWeight="bold" fontSize="sm">
-            {subtitle}
-          </Text>
-        </Box>
+        <View style={styles.subtitleContainer}>
+          <Text style={styles.subtitleText}>{subtitle}</Text>
+        </View>
       )}
-      <Container flex={1} bg="white" padding="10px" maxWidth={width} {...rest}>
-        {children}
-      </Container>
+      <View style={[styles.content, { maxWidth: width }]}>{children}</View>
       {footerActive && <CustomBottomTab navigation={navigation} />}
-    </VStack>
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'white',
+  },
+  subtitleContainer: {
+    backgroundColor: '#084077',
+    padding: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    zIndex: 999,
+  },
+  subtitleText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+  content: {
+    flex: 1,
+    backgroundColor: 'white',
+    padding: 10,
+  },
+});

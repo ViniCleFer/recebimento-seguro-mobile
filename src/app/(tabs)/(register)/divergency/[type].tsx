@@ -10,23 +10,18 @@ import {
 import * as ImagePicker from 'expo-image-picker';
 import { router, useLocalSearchParams } from 'expo-router';
 import mime from 'mime';
-import {
-  Box,
-  HStack,
-  Icon,
-  Image,
-  Input,
-  Pressable,
-  Select,
-  Text,
-  useTheme,
-  View,
-  VStack,
-} from 'native-base';
-import { shade } from 'polished';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, StyleSheet, TouchableOpacity } from 'react-native';
+import {
+  Alert,
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { v4 as uuidv4 } from 'uuid';
 import * as z from 'zod';
 
@@ -57,12 +52,108 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    bottom: '-40%',
+    bottom: '-88%',
     position: 'relative',
   },
   closeCamera: {
     position: 'absolute',
     right: 30,
+  },
+  loadingOverlay: {
+    flex: 1,
+    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 100,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  captureButton: {
+    backgroundColor: '#fff',
+    height: 60,
+    width: 60,
+    borderRadius: 30,
+  },
+  formContainer: {
+    paddingHorizontal: 8,
+  },
+  evidenceTitle: {
+    color: '#6b7280',
+    marginBottom: 16,
+  },
+  evidenceList: {
+    marginTop: 4,
+    marginBottom: 12,
+  },
+  evidenceItem: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    width: '100%',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  evidenceImage: {
+    width: 100,
+    height: 100,
+    borderRadius: 4,
+  },
+  evidenceActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    marginBottom: 24,
+    gap: 20,
+  },
+  inputGroup: {
+    marginBottom: 4,
+    paddingHorizontal: 8,
+  },
+  inputLabel: {
+    marginBottom: -8,
+    color: '#6b7280',
+  },
+  textInput: {
+    width: '100%',
+    height: 56,
+    fontSize: 16,
+    paddingBottom: 0,
+    borderBottomWidth: 1,
+    borderBottomColor: '#d1d5db',
+  },
+  selectContainer: {
+    paddingHorizontal: 8,
+    gap: 24,
+    paddingTop: 8,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    width: '100%',
+    justifyContent: 'space-between',
+    marginTop: 16,
+    paddingHorizontal: 8,
+  },
+  alertContainer: {
+    flexDirection: 'row',
+    gap: 12,
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  alertText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: -8,
+    color: 'black',
+  },
+  alertNextStep: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginTop: 8,
+    color: '#084077',
   },
 });
 
@@ -88,8 +179,6 @@ const formDivergenceSchema = z.object({
 });
 
 export default function Divergency() {
-  const { colors } = useTheme();
-
   const { back } = router;
   const { type } = useLocalSearchParams<{ type: string }>();
 
@@ -97,7 +186,7 @@ export default function Divergency() {
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const [isCameraActive, setIsCameraActive] = useState(false);
+  const [isCameraModalOpen, setIsCameraModalOpen] = useState(false);
   const [loadingPreview, setLoadingPreview] = useState(false);
   const [imagesList, setImagesList] = useState<any[]>([]);
 
@@ -210,46 +299,36 @@ export default function Divergency() {
     try {
       if (cameraRef?.current) {
         const options: CameraPictureOptions = { quality: 1, base64: true };
-
         const photo = await cameraRef?.current?.takePictureAsync(options);
-
         const mimetype = mime.getType(photo?.uri);
-
         const filename = dayjs().format('DD-MM-YYYY[T]HH:mm:ss');
-
         const size = photo?.size;
-
-        console.log('photo', JSON.stringify(photo, null, 2));
-
         setImagesList(prevState => [
           ...prevState,
           { uri: photo?.uri, base64: photo?.base64, filename, mimetype, size },
         ]);
-
-        setIsCameraActive(false);
+        setIsCameraModalOpen(false);
         setLoadingPreview(false);
       }
-      setIsCameraActive(false);
+      setIsCameraModalOpen(false);
       setLoadingPreview(false);
     } catch (error) {
       console.log('Error takePicture => ', JSON.stringify(error));
-      setIsCameraActive(false);
+      setIsCameraModalOpen(false);
       setLoadingPreview(false);
     } finally {
-      setIsCameraActive(false);
       setLoadingPreview(false);
     }
   }, []);
 
   const handleCamera = useCallback(() => {
-    console.log('permission', permission);
     if (permission && !permission?.granted) {
       requestPermission();
     } else {
       if (imagesList?.length >= 3) {
         Alert.alert('Atenção', 'Você atingiu o limite de 3 imagens.');
       } else {
-        setIsCameraActive(true);
+        setIsCameraModalOpen(true);
       }
     }
   }, [permission, requestPermission, imagesList]);
@@ -514,94 +593,70 @@ export default function Divergency() {
     }
   }, [imagesList]);
 
-  return isCameraActive ? (
-    <View style={styles.container}>
-      {loadingPreview && (
-        <Loading
-          flex={1}
-          height="100%"
-          position={'absolute'}
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          zIndex={100}
-          backgroundColor={'rgba(000, 000, 000, 0.7)'}
-        />
-      )}
-      <CameraView
-        ref={cameraRef}
-        style={{ flex: 1, flexDirection: 'row' }}
-        facing="back"
-      >
-        <Box style={styles.takePictureContainer} backgroundColor="transparent">
-          <TouchableOpacity onPress={takePicture}>
-            <Box
-              borderRadius="full"
-              style={{
-                backgroundColor: '#fff',
-                height: 60,
-                width: 60,
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.closeCamera}
-            onPress={() => {
-              setIsCameraActive(false);
-            }}
-          >
-            <MaterialIcons name="cancel" size={40} color="white" />
-          </TouchableOpacity>
-        </Box>
-      </CameraView>
-    </View>
-  ) : (
+  return (
     <>
-      {isLoading && (
-        <Loading
-          flex={1}
-          height="100%"
-          position={'absolute'}
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          zIndex={100}
-          backgroundColor={'rgba(000, 000, 000, 0.6)'}
-        />
-      )}
+      <Modal
+        visible={isCameraModalOpen}
+        animationType="slide"
+        onRequestClose={() => setIsCameraModalOpen(false)}
+        transparent={false}
+      >
+        <View
+          style={{
+            flex: 1,
+            backgroundColor: 'black',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          {loadingPreview && <Loading style={styles.loadingOverlay} />}
+          <CameraView
+            ref={cameraRef}
+            style={{ flex: 1, width: '100%' }}
+            facing="back"
+          >
+            <TouchableOpacity
+              onPress={() => setIsCameraModalOpen(false)}
+              style={[styles.closeCamera, { bottom: 20, zIndex: 10 }]}
+            >
+              <MaterialIcons name="close" size={36} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.takePictureContainer}>
+              <TouchableOpacity onPress={takePicture}>
+                <View style={styles.captureButton} />
+              </TouchableOpacity>
+            </View>
+          </CameraView>
+        </View>
+      </Modal>
+      {isLoading && <Loading style={styles.loadingOverlay} />}
       <ScrollScreenContainer subtitle="Divergência">
-        <VStack px={2}>
-          <Title mb={3}>{`Divergência - ${divergencyType()?.text}`}</Title>
+        <View style={styles.formContainer}>
+          <Title style={{ marginBottom: 12 }}>{`Divergência - ${
+            divergencyType()?.text
+          }`}</Title>
 
-          <Text color="gray.750" mb={4}>
-            Evidência(s)
-          </Text>
+          <Text style={styles.evidenceTitle}>Evidência(s)</Text>
 
           {imagesList && imagesList?.length > 0 && (
-            <VStack mt={1} mb={3}>
+            <View style={styles.evidenceList}>
               {imagesList?.map((image, index) => (
-                <HStack
-                  key={index}
-                  space={2}
-                  mb={4}
-                  w="full"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <HStack space={2} alignItems="center">
+                <View key={index} style={styles.evidenceItem}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 8,
+                    }}
+                  >
                     <Image
                       key={index}
                       source={{ uri: image?.uri }}
-                      alt="image"
-                      size="sm"
-                      width="100px"
-                      height="100px"
-                      borderRadius={4}
+                      style={styles.evidenceImage}
+                      resizeMode="cover"
                     />
-                  </HStack>
-                  <Pressable
+                  </View>
+                  <TouchableOpacity
                     onPress={() => {
                       const newImagesList = imagesList?.filter(
                         (_, idx) => idx !== index,
@@ -610,369 +665,199 @@ export default function Divergency() {
                       setImagesList(newImagesList);
                     }}
                   >
-                    <MaterialIcons
-                      name="delete"
-                      color={colors.secondary[700]}
-                      size={24}
-                    />
-                  </Pressable>
-                </HStack>
+                    <MaterialIcons name="delete" color="#dc2626" size={24} />
+                  </TouchableOpacity>
+                </View>
               ))}
-            </VStack>
+            </View>
           )}
 
-          <HStack
-            alignItems="center"
-            justifyContent="flex-start"
-            mb="24px"
-            space={5}
-          >
-            <Pressable onPress={handlePhotoLibrary}>
-              <MaterialIcons name="photo" color={colors.gray[800]} size={28} />
-            </Pressable>
-            <Pressable
+          <View style={styles.evidenceActions}>
+            <TouchableOpacity onPress={handlePhotoLibrary}>
+              <MaterialIcons name="photo" color="#374151" size={28} />
+            </TouchableOpacity>
+            <TouchableOpacity
               onPress={() => {
                 handleCamera();
               }}
             >
-              <MaterialCommunityIcons
-                name="camera"
-                color={colors.gray[800]}
-                size={28}
-              />
-            </Pressable>
-          </HStack>
-        </VStack>
+              <MaterialCommunityIcons name="camera" color="#374151" size={28} />
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        <Box mb={1} px={2}>
-          <Text mb={-2} color="gray.750">
-            Nota Fiscal/DT:
-          </Text>
-          <Input
-            w="full"
-            variant="underlined"
-            height={14}
-            size="md"
-            fontSize="md"
-            pb={0}
-            placeholderTextColor="gray.700"
+        <View style={styles.inputGroup}>
+          <Text style={styles.inputLabel}>Nota Fiscal/DT:</Text>
+          <TextInput
+            style={styles.textInput}
+            placeholderTextColor="#6b7280"
             value={nota}
             onChangeText={setNota}
-            _focus={{ borderColor: 'primary.700' }}
             placeholder=""
             autoComplete="off"
             keyboardType="numeric"
             maxLength={10}
           />
-        </Box>
+        </View>
 
         {divergencyType()?.type === TipoDivergencia.FALTA && (
-          <VStack px={2} space={6} pt={2}>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+          <View style={{ paddingHorizontal: 8, gap: 24, paddingTop: 8 }}>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual SKU está faltando fisicamente?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={sku}
-                onChangeText={t => {
-                  setSku(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setSku}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+            </View>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual a quantidade que está faltando fisicamente?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={quantidade}
-                onChangeText={t => {
-                  setQuantidade(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setQuantidade}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-
-            {/* {isAlertVisible && (
-              <HStack
-                space={3}
-                alignItems={'center'}
-                background={'gray.100'}
-                py={2}
-                px={4}
-                borderRadius={4}
-              >
-                <MaterialCommunityIcons
-                  name="alert"
-                  color={colors.primary[700]}
-                  size={24}
-                />
-                <VStack>
-                  <Text
-                    fontSize={'md'}
-                    fontWeight={'semibold'}
-                    mb={-2}
-                    color="black"
-                  >
-                    Próximo passo:
-                  </Text>
-                  <Text
-                    fontSize={'md'}
-                    fontWeight={'semibold'}
-                    mt={2}
-                    color="primary.700"
-                  >
-                    {`Solicitar o envio do saldo para a origem. (${sku} - ${quantidade})`}
-                  </Text>
-                </VStack>
-              </HStack>
-            )} */}
-          </VStack>
+            </View>
+          </View>
         )}
 
         {divergencyType()?.type === TipoDivergencia.SOBRA && (
-          <VStack px={2} space={6} pt={2}>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+          <View style={{ paddingHorizontal: 8, gap: 24, paddingTop: 8 }}>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual SKU está sobrando fisicamente?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={sku}
-                onChangeText={t => {
-                  setSku(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setSku}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+            </View>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual a quantidade que está sobrando fisicamente?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={quantidade}
-                onChangeText={t => {
-                  setQuantidade(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setQuantidade}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-          </VStack>
+            </View>
+          </View>
         )}
 
         {divergencyType()?.type === TipoDivergencia.INVERSAO && (
-          <VStack px={2} space={6} pt={2}>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+          <View style={{ paddingHorizontal: 8, gap: 24, paddingTop: 8 }}>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual SKU recebemos fisicamente?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={sku}
-                onChangeText={t => {
-                  setSku(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setSku}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+            </View>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual a quantidade que recebemos fisicamente?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={quantidade}
-                onChangeText={t => {
-                  setQuantidade(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setQuantidade}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+            </View>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual SKU está na nota fiscal?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={skuNotaFiscal}
-                onChangeText={t => {
-                  setSkuNotaFiscal(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setSkuNotaFiscal}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-            <Box mb={1}>
-              <Text mb={-2} color="gray.750">
+            </View>
+            <View style={{ marginBottom: 8 }}>
+              <Text style={{ color: '#6b7280', marginBottom: 4 }}>
                 Qual a quantidade que está na nota fiscal?
               </Text>
-              <Input
-                w="full"
-                variant="underlined"
-                height={14}
-                size="md"
-                fontSize="md"
-                pb={0}
-                placeholderTextColor="gray.700"
+              <TextInput
+                style={styles.textInput}
+                placeholderTextColor="#6b7280"
                 value={quantidadeNotaFiscal}
-                onChangeText={t => {
-                  setQuantidadeNotaFiscal(t);
-                }}
-                _focus={{ borderColor: 'primary.700' }}
+                onChangeText={setQuantidadeNotaFiscal}
                 autoComplete="off"
                 keyboardType="numeric"
               />
-            </Box>
-
-            {/* {isAlertVisible && (
-              <HStack
-                space={3}
-                alignItems={'center'}
-                background={'gray.100'}
-                py={2}
-                px={4}
-                borderRadius={4}
-              >
-                <MaterialCommunityIcons
-                  name="alert"
-                  color={colors.primary[700]}
-                  size={24}
-                />
-                <VStack>
-                  <Text
-                    fontSize={'md'}
-                    fontWeight={'semibold'}
-                    mb={-2}
-                    color="black"
-                  >
-                    Próximo passo:
-                  </Text>
-                  <Text
-                    fontSize={'md'}
-                    fontWeight={'semibold'}
-                    mt={2}
-                    color="primary.700"
-                  >
-                    {`Solicitar o envio do saldo para a origem. (${sku} - ${quantidade})`}
-                  </Text>
-                </VStack>
-              </HStack>
-            )} */}
-          </VStack>
+            </View>
+          </View>
         )}
 
-        <VStack px={2} pt={6} space={6}>
+        <View style={{ paddingHorizontal: 8, paddingTop: 24, gap: 24 }}>
           <SelectWithLabel
             label="UP de Origem"
-            selectedValue={up}
+            value={up}
             onValueChange={setUp}
-            options={listaUPsOrigem?.map(s => (
-              <Select.Item key={s?.value} label={s?.label} value={s?.value} />
-            ))}
+            options={listaUPsOrigem?.map(s => ({
+              label: s?.label,
+              value: s?.value,
+            }))}
           />
 
           <SelectWithLabel
             label="CD de Origem"
-            selectedValue={cd}
+            value={cd}
             onValueChange={setCd}
-            options={listaCDsOrigem?.map(s => (
-              <Select.Item key={s?.value} label={s?.label} value={s?.value} />
-            ))}
+            options={listaCDsOrigem?.map(s => ({
+              label: s?.label,
+              value: s?.value,
+            }))}
           />
-        </VStack>
+        </View>
 
-        <HStack mt="8%" px={2} width="100%" justifyContent="space-between">
+        <View style={styles.buttonRow}>
           <Button
-            width="48%"
-            h="50px"
-            backgroundColor="gray.700"
+            style={{ width: '48%', height: 50, backgroundColor: '#374151' }}
             title="Cancelar"
-            _pressed={{ bg: 'gray.600' }}
-            variant={'solid'}
-            _text={{
-              color: 'white',
-            }}
-            onPress={() => {
-              handleCancel();
-            }}
+            onPress={handleCancel}
             disabled={isLoading}
-            leftIcon={<Icon as={MaterialIcons} name="delete" size="md" />}
+            textStyle={{ color: 'white' }}
           />
 
           <Button
-            width="48%"
-            h="50px"
-            backgroundColor="primary.700"
+            style={{ width: '48%', height: 50, backgroundColor: '#2e2efe' }}
             title="Salvar"
-            _pressed={{ bg: shade(0.3, '#2e2efe') }}
-            variant={'solid'}
-            _text={{
-              color: 'white',
-            }}
             onPress={handleSaveDivergence}
-            isLoading={isLoading}
             disabled={isLoading}
-            leftIcon={<Icon as={MaterialIcons} name="save" size="md" />}
+            textStyle={{ color: 'white' }}
           />
-        </HStack>
+        </View>
       </ScrollScreenContainer>
     </>
   );

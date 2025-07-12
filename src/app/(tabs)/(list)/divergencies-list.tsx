@@ -1,12 +1,10 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import dayjs from 'dayjs';
-import { Box, Circle, HStack, Text, useTheme, View, VStack } from 'native-base';
-import React, { useCallback, useState } from 'react';
-import { Image } from 'expo-image';
 import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '@/components/Card';
-import { Loading } from '@/components/Loading';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
 
 import {
@@ -18,8 +16,6 @@ import { getDivergencesRequest } from '@/services/requests/divergences/utils';
 import { listaCDsOrigem, listaUPsOrigem } from '@/utils/listaUPs';
 
 export default function DivergenciesList() {
-  const { colors } = useTheme();
-
   const [loading, setLoading] = useState(false);
   const [divergenciesList, setDivergenciesList] = useState([] as Divergencia[]);
 
@@ -34,8 +30,6 @@ export default function DivergenciesList() {
         if (response?.data?.length > 0) {
           for await (const divergencia of response?.data) {
             // const evidencias = divergencia?.evidencias;
-
-            let evidenciasDownload: any[] = [];
 
             // if (evidencias?.length === 0) {
             //   evidenciasDownload = [];
@@ -95,171 +89,128 @@ export default function DivergenciesList() {
   return (
     <ScrollScreenContainer subtitle="Listagem de Divergências">
       {loading ? (
-        <Loading mt="80%" />
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Carregando...</Text>
+        </View>
       ) : (
-        <View mb="20%" pt={3}>
+        <View style={styles.container}>
           {divergenciesList?.length > 0 ? (
             divergenciesList?.map(item => (
-              <Card key={item?.id} p={4} borderRadius="4" mb={4}>
-                <HStack
-                  alignItems="center"
-                  justifyContent="space-between"
-                  mb={4}
-                >
-                  <HStack alignItems="center">
-                    <Circle bg="primary.700" h={12} w={12}>
+              <Card key={item?.id} style={styles.card}>
+                <View style={styles.header}>
+                  <View style={styles.headerLeft}>
+                    <View style={styles.circle}>
                       <MaterialIcons
                         name="calendar-month"
                         size={24}
-                        color={colors.white}
+                        color="#ffffff"
                       />
-                    </Circle>
+                    </View>
 
-                    <VStack ml={3}>
-                      <Text color="gray.750" w="100%">
-                        Data de Recebimento
-                      </Text>
-                      <Text color="black" fontWeight="semibold">
+                    <View style={styles.headerInfo}>
+                      <Text style={styles.label}>Data de Recebimento</Text>
+                      <Text style={styles.value}>
                         {dayjs(item?.created_at).format('DD/MM/YYYY')}
                       </Text>
-                    </VStack>
-                  </HStack>
-                </HStack>
+                    </View>
+                  </View>
+                </View>
 
-                <VStack pl={2} mb={4}>
-                  <Text color="gray.750">Tipo da Divergência</Text>
-                  <Text color="black" fontWeight="semibold">
-                    {item?.tipoDivergencia}
-                  </Text>
-                </VStack>
+                <View style={styles.field}>
+                  <Text style={styles.label}>Tipo da Divergência</Text>
+                  <Text style={styles.value}>{item?.tipoDivergencia}</Text>
+                </View>
 
-                <VStack pl={2} mb={4}>
-                  <Text color="gray.750">Nota Fiscal</Text>
-                  <Text color="black" fontWeight="semibold">
-                    {item?.notaFiscal}
-                  </Text>
-                </VStack>
+                <View style={styles.field}>
+                  <Text style={styles.label}>Nota Fiscal</Text>
+                  <Text style={styles.value}>{item?.notaFiscal}</Text>
+                </View>
 
                 {item?.tipoDivergencia === TipoDivergencia.FALTA && (
                   <>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">Sku Faltando Fisicamente</Text>
-                      <Text color="black" fontWeight="semibold">
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Sku Faltando Fisicamente</Text>
+                      <Text style={styles.value}>
                         {item?.skuFaltandoFisicamente}
                       </Text>
-                    </VStack>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={styles.label}>
                         Quantidade Faltando Fisicamente
                       </Text>
-                      <Text color="black" fontWeight="semibold">
+                      <Text style={styles.value}>
                         {item?.qtdFaltandoFisicamente}
                       </Text>
-                    </VStack>
+                    </View>
                   </>
                 )}
 
                 {item?.tipoDivergencia === TipoDivergencia.SOBRA && (
                   <>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">Sku Sobrando Fisicamente</Text>
-                      <Text color="black" fontWeight="semibold">
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Sku Sobrando Fisicamente</Text>
+                      <Text style={styles.value}>
                         {item?.skuSobrandoFisicamente}
                       </Text>
-                    </VStack>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={styles.label}>
                         Quantidade Sobrando Fisicamente
                       </Text>
-                      <Text color="black" fontWeight="semibold">
+                      <Text style={styles.value}>
                         {item?.qtdSobrandoFisicamente}
                       </Text>
-                    </VStack>
+                    </View>
                   </>
                 )}
 
                 {item?.tipoDivergencia === TipoDivergencia.INVERSAO && (
                   <>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">Sku Recebemos Fisicamente</Text>
-                      <Text color="black" fontWeight="semibold">
+                    <View style={styles.field}>
+                      <Text style={styles.label}>
+                        Sku Recebemos Fisicamente
+                      </Text>
+                      <Text style={styles.value}>
                         {item?.skuRecebemosFisicamente}
                       </Text>
-                    </VStack>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={styles.label}>
                         Quantidade Recebemos Fisicamente
                       </Text>
-                      <Text color="black" fontWeight="semibold">
+                      <Text style={styles.value}>
                         {item?.qtdRecebemosFisicamente}
                       </Text>
-                    </VStack>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">Nota Fiscal SKU</Text>
-                      <Text color="black" fontWeight="semibold">
-                        {item?.skuNotaFiscal}
-                      </Text>
-                    </VStack>
-                    <VStack pl={2} mb={4}>
-                      <Text color="gray.750">Quantidade Nota Fiscal</Text>
-                      <Text color="black" fontWeight="semibold">
-                        {item?.qtdNotaFiscal}
-                      </Text>
-                    </VStack>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Nota Fiscal SKU</Text>
+                      <Text style={styles.value}>{item?.skuNotaFiscal}</Text>
+                    </View>
+                    <View style={styles.field}>
+                      <Text style={styles.label}>Quantidade Nota Fiscal</Text>
+                      <Text style={styles.value}>{item?.qtdNotaFiscal}</Text>
+                    </View>
                   </>
                 )}
 
-                <VStack pl={2} mb={4}>
-                  <Text color="gray.750">Próximos passos</Text>
-                  <Text color="black" fontWeight="semibold">
-                    {item?.proximoPasso}
-                  </Text>
-                </VStack>
+                <View style={styles.field}>
+                  <Text style={styles.label}>Próximos passos</Text>
+                  <Text style={styles.value}>{item?.proximoPasso}</Text>
+                </View>
 
-                <VStack pl={2} mb={4}>
-                  <Text color="gray.750">UP de Origem</Text>
-                  <Text color="black" fontWeight="semibold">
-                    {item?.upOrigem}
-                  </Text>
-                </VStack>
-                <VStack pl={2} mb={4}>
-                  <Text color="gray.750">CD de Origem</Text>
-                  <Text color="black" fontWeight="semibold">
-                    {item?.cdOrigem}
-                  </Text>
-                </VStack>
-
-                {/* <VStack pl={2} mb={4} width="100%">
-                  <Text color="gray.750">Evidências</Text>
-                  {item?.evidencias?.length > 0 ? (
-                    <Box style={{ gap: 8 }}>
-                      {item?.evidencias?.map((item: any, index) => (
-                        <Image
-                          key={index}
-                          source={{ uri: item }}
-                          alt="image"
-                          contentFit="fill"
-                          transition={1000}
-                          style={{ width: 80, height: 80 }}
-                        />
-                      ))}
-                    </Box>
-                  ) : (
-                    <Text color="black" fontWeight="semibold">
-                      Sem evidências
-                    </Text>
-                  )}
-                </VStack> */}
+                <View style={styles.field}>
+                  <Text style={styles.label}>UP de Origem</Text>
+                  <Text style={styles.value}>{item?.upOrigem}</Text>
+                </View>
+                <View style={styles.field}>
+                  <Text style={styles.label}>CD de Origem</Text>
+                  <Text style={styles.value}>{item?.cdOrigem}</Text>
+                </View>
               </Card>
             ))
           ) : (
-            <View mt="70%" justifyContent="center" alignItems="center">
-              <Text
-                color="gray.750"
-                fontSize="lg"
-                textAlign="center"
-                justifyContent={'center'}
-              >
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyText}>
                 Nenhuma divergência encontrada
               </Text>
             </View>
@@ -269,3 +220,69 @@ export default function DivergenciesList() {
     </ScrollScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    marginTop: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    fontSize: 16,
+    color: '#6b7280',
+  },
+  container: {
+    paddingTop: 12,
+    paddingBottom: 80,
+  },
+  card: {
+    padding: 16,
+    marginBottom: 16,
+    borderRadius: 8,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  circle: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#084077',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  headerInfo: {
+    marginLeft: 12,
+  },
+  field: {
+    paddingLeft: 8,
+    marginBottom: 16,
+  },
+  label: {
+    color: '#6b7280',
+    fontSize: 14,
+    marginBottom: 2,
+  },
+  value: {
+    color: '#000000',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptyState: {
+    marginTop: 200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  emptyText: {
+    color: '#6b7280',
+    fontSize: 18,
+    textAlign: 'center',
+  },
+});

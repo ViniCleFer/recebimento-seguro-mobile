@@ -1,18 +1,22 @@
-import {
-  type IInputProps,
-  Input as NativeBaseInput,
-  Text,
-  View,
-} from 'native-base';
+import { colors } from '@/styles/theme';
 import React from 'react';
 import { type Control, Controller, type FieldError } from 'react-hook-form';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  type TextInputProps,
+  View,
+} from 'react-native';
 
-type InputProps = IInputProps & {
+type InputProps = TextInputProps & {
   control: Control<any>;
   name: string;
   label: string;
   error?: FieldError;
   isWhite?: boolean;
+  color?: string;
+  marginBottom?: number;
 };
 
 export function Input({
@@ -22,12 +26,14 @@ export function Input({
   error,
   isWhite = false,
   color,
-  mb,
+  marginBottom = 32,
+  style,
   ...rest
 }: InputProps) {
+  const [isFocused, setIsFocused] = React.useState(false);
   return (
-    <View mb={mb || 8}>
-      <Text mb={-2} textTransform="uppercase" color={color || 'primary.700'}>
+    <View style={[styles.container, { marginBottom }]}>
+      <Text style={[styles.label, { color: color || colors.primary }]}>
         {label}
       </Text>
       <Controller
@@ -36,30 +42,57 @@ export function Input({
         defaultValue=""
         render={({ field: { onChange, value, onBlur, ref } }) => (
           <>
-            <NativeBaseInput
-              w="full"
-              variant="underlined"
-              height={14}
-              size="md"
-              fontSize="md"
-              pb={0}
-              placeholderTextColor="gray.700"
+            <TextInput
+              style={[
+                styles.input,
+                style,
+                isFocused && {
+                  borderBottomColor: colors.primary,
+                  borderBottomWidth: 2,
+                },
+              ]}
               value={value}
               onChangeText={onChange}
-              onBlur={onBlur}
+              onBlur={() => {
+                setIsFocused(false);
+                onBlur();
+              }}
+              onFocus={() => setIsFocused(true)}
               ref={ref}
-              _focus={{ borderColor: 'gray.500' }}
+              placeholderTextColor="#9e9e9e"
               {...rest}
             />
 
-            {error && (
-              <Text color="secondary.700" mb={2}>
-                {error?.message}
-              </Text>
-            )}
+            {error && <Text style={styles.errorText}>{error?.message}</Text>}
           </>
         )}
       />
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  input: {
+    width: '100%',
+    height: 48,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+    fontSize: 16,
+    paddingBottom: 8,
+    paddingHorizontal: 0,
+  },
+  errorText: {
+    color: '#ff5757',
+    fontSize: 12,
+    marginTop: 4,
+  },
+});

@@ -1,12 +1,22 @@
-import { useCallback, useState } from 'react';
-import { Feather, MaterialIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Box, Icon, Image, Link, Pressable, Text, VStack } from 'native-base';
-import { useForm } from 'react-hook-form';
-import { Alert } from 'react-native';
-import { z } from 'zod';
 import * as Constants from 'expo-constants';
 import { router } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import {
+  Alert,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { z } from 'zod';
 
 import Logo from '@/assets/icon-vfcode.png';
 
@@ -46,7 +56,6 @@ export default function SignIn() {
 
   const {
     formState: { errors },
-    setValue,
     control,
     handleSubmit,
   } = useForm<FormData>({
@@ -152,180 +161,163 @@ export default function SignIn() {
 
       // Alert.alert('Login', 'Usuário ou senha inválidos');
     },
-    [supabase, setUserAuthenticated],
+    [setUserAuthenticated],
   );
 
   return (
-    <VStack
-      alignItems="center"
-      justifyContent="center"
-      zIndex={100}
-      w="100%"
-      px={'8%'}
-      bg="transparent"
-      flex={1}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 80 : 0}
     >
-      {/* <Text color="gray.750" mb={10}>
-        EHS
-      </Text> */}
-      <Box
-        height="100px"
-        width="100px"
-        alignItems="center"
-        justifyContent="center"
-        mb={10}
-        borderRadius={10}
-        overflow={'hidden'}
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
       >
-        <Image
-          alt="logo ehs"
-          source={Logo}
-          defaultSource={Logo}
-          height={'100%'}
-          resizeMode="contain"
-        />
-      </Box>
+        <View style={styles.container}>
+          <View style={styles.logoContainer}>
+            <Image source={Logo} style={styles.logo} resizeMode="contain" />
+          </View>
 
-      <Input
-        control={control}
-        name="email"
-        label="E-MAIL"
-        placeholder="Digite seu e-mail"
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        error={errors?.email}
-        _focus={{ borderColor: 'primary.700' }}
-        // value={email}
-        // onChangeText={t => {
-        //   setEmail(t);
-        //   setValue('email', t);
-        // }}
-      />
-      {/* 
-      <Input
-        label="LOGIN"
-        name="email"
-        control={control}
-        placeholder="E-mail ou RE"
-        autoCapitalize="none"
-        autoCorrect={false}
-        keyboardType="email-address"
-        error={errors.email}
-        _focus={{ borderColor: 'primary.700' }}
-      /> */}
-      <Input
-        label="SENHA"
-        name="password"
-        control={control}
-        error={errors?.password}
-        placeholder="Digite sua senha"
-        secureTextEntry={closedEyes}
-        autoComplete="off"
-        _focus={{ borderColor: 'primary.700' }}
-        // value={password}
-        // onChangeText={t => {
-        //   setPassword(t);
-        //   setValue('password', t);
-        // }}
-        InputRightElement={
-          <Pressable
-            display="center"
-            alignItems="center"
-            justifyContent="center"
-            p={4}
-            onPress={() => {
-              setClosedEyes(prevState => !prevState);
-            }}
-          >
-            <Icon
-              as={Feather}
-              name={closedEyes ? 'eye-off' : 'eye'}
-              color={errors.password ? 'secondary.700' : 'gray.700'}
-              size={4}
-              focusable
+          <Input
+            control={control}
+            name="email"
+            label="E-MAIL"
+            placeholder="Digite seu e-mail"
+            autoCapitalize="none"
+            autoCorrect={false}
+            keyboardType="email-address"
+            error={errors?.email}
+          />
+
+          <View style={styles.passwordContainer}>
+            <Input
+              label="SENHA"
+              name="password"
+              control={control}
+              error={errors?.password}
+              placeholder="Digite sua senha"
+              secureTextEntry={closedEyes}
+              autoComplete="off"
+              style={styles.passwordInput}
             />
-          </Pressable>
-        }
-      />
-      {/* <Input
-        label="SENHA"
-        name="password"
-        control={control}
-        error={errors.password}
-        placeholder="Senha"
-        secureTextEntry={closedEyes}
-        autoComplete="off"
-        _focus={{ borderColor: 'primary.700' }}
-        InputRightElement={
-          <Pressable
-            display="center"
-            alignItems="center"
-            justifyContent="center"
-            p={4}
+            <Pressable
+              style={styles.eyeButton}
+              onPress={() => {
+                setClosedEyes(prevState => !prevState);
+              }}
+            >
+              <Feather
+                name={closedEyes ? 'eye-off' : 'eye'}
+                color={errors.password ? '#DC2626' : '#6B7280'}
+                size={20}
+              />
+            </Pressable>
+          </View>
+
+          <Button
+            title={isLoading ? 'Carregando...' : 'Entrar'}
+            onPress={handleSubmit(handleLogin)}
+            disabled={isLoading}
+            style={[styles.loginButton, isLoading && styles.disabledButton]}
+          />
+
+          <TouchableOpacity
             onPress={() => {
-              setClosedEyes(prevState => !prevState);
+              router.navigate('/sign-up');
             }}
+            style={styles.linkButton}
           >
-            <Icon
-              as={Feather}
-              name={closedEyes ? 'eye-off' : 'eye'}
-              color={errors.password ? 'secondary.700' : 'gray.700'}
-              size={4}
-              focusable
-            />
-          </Pressable>
-        }
-      /> */}
+            <Text style={styles.linkText}>Cadastre-se</Text>
+          </TouchableOpacity>
 
-      <Button
-        backgroundColor="primary.700"
-        title="Entrar"
-        my={2}
-        _pressed={{ bg: 'primary.600' }}
-        variant={'solid'}
-        _text={{
-          color: 'white',
-        }}
-        onPress={handleSubmit(handleLogin)}
-        isLoading={isLoading}
-        disabled={isLoading}
-        leftIcon={<Icon as={MaterialIcons} name="login" size="md" />}
-      />
+          <TouchableOpacity
+            onPress={() => {
+              router.navigate('/forgot-password');
+            }}
+            style={styles.linkButton}
+          >
+            <Text style={styles.linkText}>Esqueceu a senha?</Text>
+          </TouchableOpacity>
 
-      <Link
-        onPress={() => {
-          router.navigate('/sign-up');
-        }}
-        alignSelf="center"
-        padding={2}
-      >
-        Cadastre-se
-      </Link>
-
-      <Link
-        onPress={() => {
-          router.navigate('/forgot-password');
-        }}
-        alignSelf="center"
-        padding={2}
-      >
-        Esqueceu a senha?
-      </Link>
-
-      <Box
-        justifyContent="center"
-        alignItems="center"
-        position="fixed"
-        bottom={'-8%'}
-      >
-        <Text color="gray.750" fontSize="12px" fontWeight="semibold">
-          @Copyright VF Code LTDA {actualYear}
-        </Text>
-        <Text color="gray.700" fontSize="12px">
-          Versão {currentVersion}
-        </Text>
-      </Box>
-    </VStack>
+          <View style={styles.footer}>
+            <Text style={styles.copyrightText}>
+              @Copyright VF Code LTDA {actualYear}
+            </Text>
+            <Text style={styles.versionText}>Versão {currentVersion}</Text>
+          </View>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: '8%',
+    backgroundColor: 'transparent',
+    zIndex: 100,
+    width: '100%',
+  },
+  logoContainer: {
+    height: 100,
+    width: 100,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 40,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  logo: {
+    height: '100%',
+    width: '100%',
+  },
+  passwordContainer: {
+    position: 'relative',
+    width: '100%',
+  },
+  passwordInput: {
+    paddingRight: 50,
+  },
+  eyeButton: {
+    position: 'absolute',
+    right: 0,
+    top: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    zIndex: 1,
+  },
+  loginButton: {
+    marginVertical: 8,
+  },
+  disabledButton: {
+    opacity: 0.6,
+  },
+  linkButton: {
+    alignSelf: 'center',
+    padding: 8,
+  },
+  linkText: {
+    color: '#3B82F6',
+    fontSize: 16,
+  },
+  footer: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 32,
+  },
+  copyrightText: {
+    color: '#374151',
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  versionText: {
+    color: '#6B7280',
+    fontSize: 12,
+  },
+});

@@ -1,11 +1,13 @@
+import React from 'react';
 import {
-  type ISpinnerProps,
-  PresenceTransition,
-  Spinner,
+  ActivityIndicator,
+  Modal,
+  StyleSheet,
   View,
-} from 'native-base';
+  type ActivityIndicatorProps,
+} from 'react-native';
 
-type BackdropProps = ISpinnerProps & {
+type BackdropProps = ActivityIndicatorProps & {
   visible: boolean;
 };
 
@@ -14,32 +16,33 @@ export const Backdrop = ({
   color = 'white',
   ...rest
 }: BackdropProps) => {
+  if (!visible) return null;
+
   return (
-    <PresenceTransition
-      style={{
-        position: 'absolute',
-        zIndex: 900,
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-        flex: 1,
-        backgroundColor: 'rgba(100,100,100,0.3)',
-      }}
-      visible={visible}
-      initial={{
-        opacity: 0,
-      }}
-      animate={{
-        opacity: 1,
-        transition: {
-          duration: 250,
-        },
-      }}
-    >
-      <View flex={1} justifyContent={'center'} alignItems={'center'}>
-        <Spinner color={color} size="lg" {...rest} />
+    <Modal transparent visible={visible} animationType="fade">
+      <View style={styles.backdrop}>
+        <View style={styles.container}>
+          <ActivityIndicator color={color} size="large" {...rest} />
+        </View>
       </View>
-    </PresenceTransition>
+    </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  backdrop: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    flex: 1,
+    backgroundColor: 'rgba(100,100,100,0.3)',
+    zIndex: 900,
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+});

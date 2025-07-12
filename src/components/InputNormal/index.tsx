@@ -1,50 +1,76 @@
-import {
-  type IInputProps,
-  Input as NativeBaseInput,
-  Text,
-  View,
-} from 'native-base';
+import { colors } from '@/styles/theme';
 import React from 'react';
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type TextInputProps,
+} from 'react-native';
 
-type InputProps = IInputProps & {
+type InputProps = TextInputProps & {
   label: string;
   error?: string;
+  color?: string;
+  marginBottom?: number;
+  textTransform?: 'uppercase' | 'lowercase' | 'capitalize' | 'none';
 };
 
 export function InputNormal({
   label,
   error,
   color,
-  mb,
+  marginBottom = 32,
   textTransform = 'uppercase',
+  style,
   ...rest
 }: InputProps) {
   return (
-    <View mb={mb || 8}>
+    <View style={[styles.container, { marginBottom }]}>
       <Text
-        mb={-2}
-        textTransform={textTransform}
-        color={color || 'primary.700'}
+        style={[
+          styles.label,
+          {
+            color: color || colors.primary,
+            textTransform: textTransform,
+          },
+        ]}
       >
         {label}
       </Text>
 
-      <NativeBaseInput
-        w="full"
-        variant="underlined"
-        height={14}
-        size="md"
-        fontSize="md"
-        pb={0}
-        placeholderTextColor="gray.700"
+      <TextInput
+        style={[styles.input, style]}
+        placeholderTextColor={colors.gray700}
         {...rest}
       />
 
-      {error && (
-        <Text color="secondary.700" mb={2}>
-          {error}
-        </Text>
-      )}
+      {error && <Text style={styles.errorText}>{error}</Text>}
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+  },
+  label: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  input: {
+    width: '100%',
+    height: 48,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.gray500,
+    fontSize: 16,
+    paddingBottom: 8,
+    paddingHorizontal: 0,
+  },
+  errorText: {
+    color: colors.error,
+    fontSize: 12,
+    marginTop: 4,
+  },
+});

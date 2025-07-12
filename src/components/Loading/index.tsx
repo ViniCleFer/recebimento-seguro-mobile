@@ -1,12 +1,28 @@
-import { Center, type ICenterProps, Spinner } from 'native-base';
+import { colors } from '@/styles/theme';
 import React from 'react';
+import {
+  ActivityIndicator,
+  StyleSheet,
+  View,
+  type ViewProps,
+} from 'react-native';
 
-type LoadingProps = ICenterProps;
+type LoadingProps = ViewProps;
 
-export const Loading = ({ ...rest }: LoadingProps) => {
+export const Loading = ({ style, ...rest }: LoadingProps) => {
   return (
-    <Center flex={1} bg="white" zIndex={999} {...rest}>
-      <Spinner color="primary.700" size="lg" />
-    </Center>
+    <View style={[styles.container, style]} {...rest}>
+      <ActivityIndicator size="large" color={colors.primary} />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+});

@@ -1,13 +1,12 @@
-import { useCallback } from 'react';
 import { MaterialIcons } from '@expo/vector-icons';
-import { HStack, Pressable, Text, useTheme } from 'native-base';
+import { useCallback } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 import { Card } from '@/components/Card';
 import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
 import { router } from 'expo-router';
 
 export default function SelectFormType() {
-  const { colors } = useTheme();
   const { navigate } = router;
 
   const handleCreateFormPtp = useCallback(() => {
@@ -22,96 +21,67 @@ export default function SelectFormType() {
     navigate('/carta-controle');
   }, [navigate]);
 
+  const handleCreateLaudoCrm = useCallback(() => {
+    navigate('/laudo-crm/4823648623424');
+  }, [navigate]);
+
   return (
     <ScrollScreenContainer subtitle="Selecione o tipo de formulário para cadastro">
-      <Pressable onPress={handleCreateFormPtp}>
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="add-business"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              PTP Logístico
-            </Text>
-          </HStack>
+      <TouchableOpacity onPress={handleCreateFormPtp}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="add-business" size={30} color="#084077" />
+            <Text style={styles.cardText}>PTP Logístico</Text>
+          </View>
         </Card>
-      </Pressable>
-      {/* <Pressable
-        onPress={() => {
-          navigate('/laudo-crm/58d40fbc-2848-4de7-83c0-a38e987d3313');
-        }}
-      >
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="warning"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              Laudo CRM
-            </Text>
-          </HStack>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleCreateDivergencia}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="add-chart" size={30} color="#084077" />
+            <Text style={styles.cardText}>Divergência</Text>
+          </View>
         </Card>
-      </Pressable> */}
-      <Pressable onPress={handleCreateDivergencia}>
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="add-chart"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              Divergência
-            </Text>
-          </HStack>
+      </TouchableOpacity>
+
+      <TouchableOpacity onPress={handleCreateCartaControle}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="post-add" size={30} color="#084077" />
+            <Text style={styles.cardText}>Carta Controle</Text>
+          </View>
         </Card>
-      </Pressable>
-      <Pressable onPress={handleCreateCartaControle}>
-        <Card
-          bg="white"
-          mt="8px"
-          mb="12px"
-          h="80px"
-          justifyContent="center"
-          p={3}
-        >
-          <HStack bg="white" alignItems="center" space={3}>
-            <MaterialIcons
-              name="post-add"
-              size={30}
-              color={colors.primary[700]}
-            />
-            <Text color="gray.700" fontSize="lg">
-              Carta Controle
-            </Text>
-          </HStack>
+      </TouchableOpacity>
+      <TouchableOpacity onPress={handleCreateLaudoCrm}>
+        <Card style={styles.card}>
+          <View style={styles.cardContent}>
+            <MaterialIcons name="post-add" size={30} color="#084077" />
+            <Text style={styles.cardText}>Laudo CRM</Text>
+          </View>
         </Card>
-      </Pressable>
+      </TouchableOpacity>
     </ScrollScreenContainer>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: 'white',
+    marginTop: 8,
+    marginBottom: 12,
+    height: 80,
+    justifyContent: 'center',
+    padding: 12,
+  },
+  cardContent: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  cardText: {
+    color: '#6B7280',
+    fontSize: 18,
+  },
+});

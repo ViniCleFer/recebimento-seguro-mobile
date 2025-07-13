@@ -2,7 +2,7 @@
   "expo": {
     "name": "safe-receipt",
     "slug": "safe-receipt",
-    "version": "1.0.35",
+    "version": "1.0.37",
     "orientation": "portrait",
     "icon": "./assets/images/icon-vfcode.png",
     "scheme": "safereceipt",
@@ -18,7 +18,7 @@
         "android.permission.RECORD_AUDIO"
       ],
       "package": "com.viniciuscf.safereceipt",
-      "versionCode": 35,
+      "versionCode": 37,
       "edgeToEdgeEnabled": true,
       "compileSdkVersion": 35,
       "targetSdkVersion": 35

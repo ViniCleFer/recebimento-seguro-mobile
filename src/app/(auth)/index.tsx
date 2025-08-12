@@ -241,9 +241,9 @@ export default function SignIn() {
           </TouchableOpacity>
 
           <View style={styles.footer}>
-            <Text style={styles.copyrightText}>
+            {/* <Text style={styles.copyrightText}>
               @Copyright VF Code LTDA {actualYear}
-            </Text>
+            </Text> */}
             <Text style={styles.versionText}>Versão {currentVersion}</Text>
           </View>
         </View>

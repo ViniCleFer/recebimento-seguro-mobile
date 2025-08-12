@@ -929,7 +929,7 @@ export default function Divergency() {
                                         name="lote"
                                         keyboardType="numeric"
                                         autoCorrect={false}
-                                        maxLength={10}
+                                        maxLength={100}
                                       />
                                     )}
 

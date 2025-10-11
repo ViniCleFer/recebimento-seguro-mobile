@@ -194,14 +194,13 @@ export default function Divergency() {
 
   const { type } = useLocalSearchParams<{ type: string }>();
 
-  const user = useAuthStore(state => state.user);
+  const { user } = useAuthStore(state => state);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingEnunciados, setIsLoadingEnunciados] = useState(false);
 
   const [dataIdentificacao, setDataIdentificacao] = useState(new Date());
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
-  const [conferente, setConferente] = useState('');
   const [nota, setNota] = useState('');
   const [up, setUp] = useState('');
   const [codProduto, setCodProduto] = useState('');
@@ -218,7 +217,6 @@ export default function Divergency() {
     }[]
   >([]);
   const [showEnunciados, setShowEnunciados] = useState(false);
-  const [conferenteFocused, setConferenteFocused] = useState(false);
   const [notaFocused, setNotaFocused] = useState(false);
 
   const { control, watch, getValues, setValue } = useForm<any>({
@@ -320,7 +318,6 @@ export default function Divergency() {
   };
 
   const handleClear = useCallback(() => {
-    setConferente('');
     setNota('');
     setUp('');
     setDataIdentificacao(new Date());
@@ -343,14 +340,7 @@ export default function Divergency() {
     setIsLoading(true);
 
     if (getSpecificationType()?.type === TipoEspecificacao.RECEBIMENTO) {
-      if (
-        !type ||
-        !dataIdentificacao ||
-        !conferente ||
-        !nota ||
-        !up ||
-        !qtdAnalisada
-      ) {
+      if (!type || !dataIdentificacao || !nota || !up || !qtdAnalisada) {
         Alert.alert(
           'Salvar PTP',
           'Por favor, preencha todos os campos para responder as perguntas.',
@@ -360,7 +350,7 @@ export default function Divergency() {
       }
     }
     if (getSpecificationType()?.type === TipoEspecificacao.SEPARACAO_MONTAGEM) {
-      if (!type || !dataIdentificacao || !conferente || !nota) {
+      if (!type || !dataIdentificacao || !nota) {
         Alert.alert(
           'Salvar PTP',
           'Por favor, preencha todos os campos para responder as perguntas.',
@@ -370,7 +360,7 @@ export default function Divergency() {
       }
     }
     if (getSpecificationType()?.type === TipoEspecificacao.ARMAZENAMENTO) {
-      if (!type || !dataIdentificacao || !conferente) {
+      if (!type || !dataIdentificacao) {
         Alert.alert(
           'Salvar PTP',
           'Por favor, preencha todos os campos para responder as perguntas.',
@@ -382,7 +372,7 @@ export default function Divergency() {
 
     const data = {
       dataExecucao: dataIdentificacao,
-      conferente,
+      conferente: user?.user_metadata?.name!,
       notaFiscal: nota ? nota : null,
       opcaoUp: up ? up : null,
       status: FormPtpStatus.EM_ANDAMENTO,
@@ -413,7 +403,6 @@ export default function Divergency() {
     setIsLoading(false);
   }, [
     dataIdentificacao,
-    conferente,
     nota,
     up,
     qtdAnalisada,
@@ -421,6 +410,7 @@ export default function Divergency() {
     setSelectedFormPtp,
     type,
     getSpecificationType,
+    user,
   ]);
 
   const handleSaveFormPtpAnswers = useCallback(async () => {
@@ -707,20 +697,9 @@ export default function Divergency() {
           <View style={styles.inputGroup}>
             <Text style={styles.inputLabel}>Conferente/Técnico:</Text>
             <TextInput
-              style={[
-                styles.textInput,
-                conferenteFocused && {
-                  borderBottomColor: '#084077',
-                  borderBottomWidth: 2,
-                },
-              ]}
-              value={conferente}
-              onChangeText={setConferente}
-              placeholderTextColor="#6b7280"
-              editable={!showEnunciados}
-              autoComplete="off"
-              onFocus={() => setConferenteFocused(true)}
-              onBlur={() => setConferenteFocused(false)}
+              style={styles.textInput}
+              value={user?.user_metadata?.name}
+              editable={false}
             />
           </View>
 

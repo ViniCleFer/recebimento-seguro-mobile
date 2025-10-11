@@ -162,7 +162,7 @@ export default function CartaControle() {
   const { replace } = router;
   const rootNavigation = useNavigationContainerRef();
 
-  const user = useAuthStore(state => state.user);
+  const { user } = useAuthStore(state => state);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -174,7 +174,6 @@ export default function CartaControle() {
   const [turno, setTurno] = useState('');
   const [documentoTransporte, setDocumentoTransporte] = useState('');
   const [remessa, setRemessa] = useState('');
-  const [conferente, setConferente] = useState(''); // inicial
   const [doca, setDoca] = useState(''); // inicial
   const [capacidadeVeiculo, setCapacidadeVeiculo] = useState(''); // inicial
   const [observacoes, setObservacoes] = useState(''); // inicial
@@ -200,7 +199,6 @@ export default function CartaControle() {
     setTurno('');
     setDocumentoTransporte('');
     setRemessa('');
-    setConferente('');
     setDoca('');
     setCapacidadeVeiculo('');
     setImagesList([]);
@@ -401,7 +399,6 @@ export default function CartaControle() {
       !dataIdentificacao ||
       !turno ||
       !remessa ||
-      !conferente ||
       !doca ||
       !capacidadeVeiculo
     ) {
@@ -416,7 +413,7 @@ export default function CartaControle() {
       documentoTransporte,
       remessa,
       doca: doca ? doca : null,
-      conferente: conferente ? conferente : null,
+      conferente: user?.user_metadata?.name!,
       capacidadeVeiculo: capacidadeVeiculo ? capacidadeVeiculo : null,
       observacoes: observacoes ? observacoes : null,
       evidencias: [],
@@ -560,7 +557,6 @@ export default function CartaControle() {
     turno,
     documentoTransporte,
     remessa,
-    conferente,
     doca,
     capacidadeVeiculo,
     imagesList,
@@ -784,10 +780,8 @@ export default function CartaControle() {
               <Text style={styles.inputLabel}>Conferente/Técnico:</Text>
               <TextInput
                 style={styles.textInput}
-                placeholder="Digite o nome do conferente"
                 placeholderTextColor="#6b7280"
-                value={conferente}
-                onChangeText={setConferente}
+                value={user?.user_metadata?.name}
                 editable={false}
               />
             </View>

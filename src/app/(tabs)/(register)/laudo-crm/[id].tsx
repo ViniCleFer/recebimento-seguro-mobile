@@ -873,7 +873,7 @@ export default function LaudoCrm() {
 
           {haDivergencia === 'sim' && (
             <Text
-              style={{ color: '#2e2efe', fontSize: 22, fontWeight: 'bold' }}
+              style={{ color: '#084077', fontSize: 22, fontWeight: 'bold' }}
             >
               Divergência
             </Text>
@@ -1094,7 +1094,7 @@ export default function LaudoCrm() {
 
           {haDivergencia === 'sim' && (
             <Text
-              style={{ color: '#2e2efe', fontSize: 22, fontWeight: 'bold' }}
+              style={{ color: '#084077', fontSize: 22, fontWeight: 'bold' }}
             >
               Laudo CRM
             </Text>
@@ -1252,7 +1252,7 @@ export default function LaudoCrm() {
           <TouchableOpacity
             // onPress={() => setIsDatePickerVisible(prevState => !prevState)}
             style={{
-              backgroundColor: '#2e2efe',
+              backgroundColor: '#084077',
               paddingHorizontal: 8,
               paddingVertical: 4,
               borderRadius: 4,
@@ -1675,7 +1675,7 @@ export default function LaudoCrm() {
               textStyle={{ color: 'white' }}
             />
             <Button
-              style={{ width: '48%', height: 50, backgroundColor: '#2e2efe' }}
+              style={{ width: '48%', height: 50, backgroundColor: '#084077' }}
               title="Salvar"
               onPress={handleSaveLaudoCrm}
               disabled={isLoading}

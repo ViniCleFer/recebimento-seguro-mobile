@@ -5,26 +5,28 @@ import 'intl/locale-data/jsonp/en';
 import { supabase } from '@/lib/supabase';
 import useAuthStore from '@/store/auth';
 import { Session } from '@supabase/supabase-js';
-import { Redirect, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 
 export default function MainLayout() {
-  const { user } = useAuthStore(state => state);
+  const { user, setSigned } = useAuthStore(state => state);
   const [session, setSession] = useState<Session | null>(null);
 
-  useEffect(() => {
-    console.log('MainLayout useEffect');
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log('MainLayout useEffect getSession', session);
-      setSession(session);
-    });
+  // useEffect(() => {
+  //   console.log('MainLayout useEffect');
+  //   supabase.auth.getSession().then(({ data: { session } }) => {
+  //     console.log('MainLayout useEffect getSession', session);
+  //     setSession(session);
+  //     setSigned(true);
+  //   });
 
-    supabase.auth.onAuthStateChange((_event, session) => {
-      console.log('MainLayout useEffect onAuthStateChange', session);
-      setSession(session);
-    });
-  }, []);
+  //   supabase.auth.onAuthStateChange((_event, session) => {
+  //     console.log('MainLayout useEffect onAuthStateChange', session);
+  //     setSession(session);
+  //     setSigned(true);
+  //   });
+  // }, [setSigned]);
 
   useEffect(() => {
     const prepare = async () => {
@@ -48,23 +50,25 @@ export default function MainLayout() {
         );
       }
 
-      if (
-        userData?.permissions?.length === 0 ||
-        !userData?.permissions?.includes('MOBILE')
-      ) {
-        return Alert.alert(
-          'Login',
-          'Usuário sem permissão para acessar o aplicativo!',
-        );
-      } else {
-        return <Redirect href="/(tabs)/(list)" />;
-      }
+      // if (
+      //   userData?.permissions?.length === 0 ||
+      //   !userData?.permissions?.includes('MOBILE')
+      // ) {
+      //   setSigned(false);
+      //   return Alert.alert(
+      //     'Login',
+      //     'Usuário sem permissão para acessar o aplicativo!',
+      //   );
+      // } else {
+      //   setSigned(true);
+      //   // return <Redirect href="/(tabs)/(list)" />;
+      // }
     };
 
     if (session && user) {
       prepare();
     }
-  }, [session, user]);
+  }, [session, user, setSigned]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>

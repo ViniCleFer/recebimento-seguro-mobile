@@ -2,8 +2,8 @@ import '@/lib/dayjs';
 import 'intl';
 import 'intl/locale-data/jsonp/en';
 
-import { AuthProvider } from '@/contexts/AuthContext';
-import { Slot } from 'expo-router';
+import useAuthStore from '@/store/auth';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Updates from 'expo-updates';
 import { useEffect, useState } from 'react';
@@ -27,6 +27,24 @@ SplashScreen.preventAutoHideAsync();
 //     </AuthProvider>
 //   );
 // }
+
+function InitialLayout() {
+  const { signed } = useAuthStore(state => state);
+
+  console.log('InitialLayout -> signed', signed);
+
+  return (
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Protected guard={!signed}>
+        <Stack.Screen name="(auth)" />
+      </Stack.Protected>
+
+      <Stack.Protected guard={signed}>
+        <Stack.Screen name="(tabs)" />
+      </Stack.Protected>
+    </Stack>
+  );
+}
 
 export default function RootLayout() {
   // const [fontsLoaded, setFontsLoaded] = useState(false);
@@ -99,9 +117,7 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <StatusBar backgroundColor="white" barStyle="dark-content" translucent />
       <View style={{ flex: 1 }}>
-        <AuthProvider>
-          <Slot />
-        </AuthProvider>
+        <InitialLayout />
       </View>
     </GestureHandlerRootView>
   );

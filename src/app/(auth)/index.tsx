@@ -46,7 +46,7 @@ const formValidation = (): any => {
 export default function SignIn() {
   const currentVersion = Constants?.default?.expoConfig?.version;
 
-  const { setUserAuthenticated } = useAuthStore(state => state);
+  const { setUserAuthenticated, setSigned } = useAuthStore(state => state);
   // const { setAuthenticatedUser } = useAuth();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -99,6 +99,8 @@ export default function SignIn() {
         email: formData?.email,
         password: formData?.password,
       });
+
+      console.log('SignIn => handleLogin', JSON.stringify(session, null, 2));
 
       if (error) {
         setIsLoading(false);
@@ -155,13 +157,13 @@ export default function SignIn() {
         };
 
         setUserAuthenticated(user, tokens);
-        router.replace('/(tabs)/(list)');
+        setSigned(true);
       }
       setIsLoading(false);
 
       // Alert.alert('Login', 'Usuário ou senha inválidos');
     },
-    [setUserAuthenticated],
+    [setUserAuthenticated, setSigned],
   );
 
   return (

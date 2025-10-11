@@ -29,7 +29,9 @@ export const Header = ({ zIndex = 1, style, ...rest }: HeaderProps) => {
 
   const router = useRouter();
 
-  const { user, setUserAuthenticated } = useAuthStore(state => state);
+  const { user, setUserAuthenticated, setSigned } = useAuthStore(
+    state => state,
+  );
 
   const [hasNavigation, setHasNavigation] = useState(false);
 
@@ -52,8 +54,9 @@ export const Header = ({ zIndex = 1, style, ...rest }: HeaderProps) => {
     }
 
     setUserAuthenticated(null, null);
-    router.replace('/(auth)');
-  }, [router, setUserAuthenticated]);
+    setSigned(false);
+    // router.replace('/(auth)');
+  }, [setUserAuthenticated, setSigned]);
 
   return (
     <View

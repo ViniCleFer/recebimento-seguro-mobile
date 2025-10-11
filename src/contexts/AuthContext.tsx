@@ -1,5 +1,5 @@
-import { createContext, ReactNode, useContext, useState } from 'react';
 import { User } from '@supabase/supabase-js';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 interface AuthContextProps {
   user: User | null;

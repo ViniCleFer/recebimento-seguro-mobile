@@ -87,7 +87,7 @@ export default function SelectFormType() {
           <Text style={styles.cardText}>Carta Controle</Text>
         </View>
       </TouchableOpacity>
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={handleCreateLaudoCrm}
         style={styles.card}
         activeOpacity={0.7}
@@ -96,7 +96,7 @@ export default function SelectFormType() {
           <MaterialIcons name="post-add" size={30} color="#084077" />
           <Text style={styles.cardText}>Laudo CRM</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </ScrollScreenContainer>
   );
 }

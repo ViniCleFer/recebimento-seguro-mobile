@@ -19,9 +19,7 @@
       ],
       "package": "com.viniciuscf.safereceipt",
       "versionCode": 38,
-      "edgeToEdgeEnabled": true,
-      "compileSdkVersion": 35,
-      "targetSdkVersion": 35
+      "edgeToEdgeEnabled": true
     },
     "web": {
       "bundler": "metro",
@@ -54,7 +52,8 @@
         }
       ],
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true

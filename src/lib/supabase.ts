@@ -35,21 +35,88 @@ import 'react-native-url-polyfill/auto';
 
 import { createClient } from '@supabase/supabase-js';
 
-import { env } from './env';
-
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_PROJECT_URL!;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_API_KEY!;
 
-// Use a custom secure storage solution for the Supabase client to store the JWT
+// SecureStore has a 2048 byte limit per key
+// Split large values into chunks to avoid the warning
+const CHUNK_SIZE = 2048;
+
 const ExpoSecureStoreAdapter = {
-  getItem: (key: string) => {
-    return SecureStore.getItemAsync(key);
+  getItem: async (key: string) => {
+    try {
+      // Try to get the first chunk
+      const firstChunk = await SecureStore.getItemAsync(key);
+      if (!firstChunk) return null;
+
+      // Check if there are additional chunks
+      const chunkCountStr = await SecureStore.getItemAsync(`${key}_chunks`);
+      if (!chunkCountStr) {
+        // No chunks, return the value as-is
+        return firstChunk;
+      }
+
+      // Reconstruct the value from chunks
+      const chunkCount = parseInt(chunkCountStr, 10);
+      let fullValue = firstChunk;
+
+      for (let i = 1; i < chunkCount; i++) {
+        const chunk = await SecureStore.getItemAsync(`${key}_${i}`);
+        if (chunk) {
+          fullValue += chunk;
+        }
+      }
+
+      return fullValue;
+    } catch (error) {
+      console.error('SecureStore getItem error:', error);
+      return null;
+    }
   },
-  setItem: (key: string, value: string) => {
-    SecureStore.setItemAsync(key, value);
+  setItem: async (key: string, value: string) => {
+    try {
+      // If value is small enough, store it directly
+      if (value.length <= CHUNK_SIZE) {
+        await SecureStore.setItemAsync(key, value);
+        // Clean up any existing chunks
+        await SecureStore.deleteItemAsync(`${key}_chunks`);
+        return;
+      }
+
+      // Split value into chunks
+      const chunks: string[] = [];
+      for (let i = 0; i < value.length; i += CHUNK_SIZE) {
+        chunks.push(value.substring(i, i + CHUNK_SIZE));
+      }
+
+      // Store each chunk
+      for (let i = 0; i < chunks.length; i++) {
+        await SecureStore.setItemAsync(i === 0 ? key : `${key}_${i}`, chunks[i]);
+      }
+
+      // Store chunk count for retrieval
+      await SecureStore.setItemAsync(`${key}_chunks`, chunks.length.toString());
+    } catch (error) {
+      console.error('SecureStore setItem error:', error);
+    }
   },
-  removeItem: (key: string) => {
-    SecureStore.deleteItemAsync(key);
+  removeItem: async (key: string) => {
+    try {
+      // Remove main key
+      await SecureStore.deleteItemAsync(key);
+
+      // Check for chunks and remove them
+      const chunkCountStr = await SecureStore.getItemAsync(`${key}_chunks`);
+      if (chunkCountStr) {
+        const chunkCount = parseInt(chunkCountStr, 10);
+        for (let i = 1; i < chunkCount; i++) {
+          await SecureStore.deleteItemAsync(`${key}_${i}`);
+        }
+        await SecureStore.deleteItemAsync(`${key}_chunks`);
+      }
+    } catch (error) {
+      console.error('SecureStore removeItem error:', error);
+    }
   },
 };
 

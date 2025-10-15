@@ -26,6 +26,7 @@ import { Input } from '@/components/Input';
 import useAuthStore from '@/store/auth';
 
 import { supabase } from '@/lib/supabase';
+import { colors } from '@/styles/theme';
 
 interface FormData {
   email: string;
@@ -283,6 +284,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     paddingRight: 50,
+    color: colors.black,
   },
   eyeButton: {
     position: 'absolute',

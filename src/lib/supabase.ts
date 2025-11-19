@@ -91,7 +91,10 @@ const ExpoSecureStoreAdapter = {
 
       // Store each chunk
       for (let i = 0; i < chunks.length; i++) {
-        await SecureStore.setItemAsync(i === 0 ? key : `${key}_${i}`, chunks[i]);
+        await SecureStore.setItemAsync(
+          i === 0 ? key : `${key}_${i}`,
+          chunks[i],
+        );
       }
 
       // Store chunk count for retrieval
@@ -125,5 +128,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: ExpoSecureStoreAdapter as any,
     detectSessionInUrl: false,
+    // autoRefreshToken: true,
+    // persistSession: true,
   },
 });

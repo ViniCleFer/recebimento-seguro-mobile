@@ -4,14 +4,13 @@ import 'intl/locale-data/jsonp/en';
 
 import { supabase } from '@/lib/supabase';
 import useAuthStore from '@/store/auth';
-import { Session } from '@supabase/supabase-js';
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Alert } from 'react-native';
 
 export default function MainLayout() {
   const { user, setSigned } = useAuthStore(state => state);
-  const [session, setSession] = useState<Session | null>(null);
+  // const [session, setSession] = useState<Session | null>(null);
 
   // useEffect(() => {
   //   console.log('MainLayout useEffect');
@@ -65,14 +64,17 @@ export default function MainLayout() {
       // }
     };
 
-    if (session && user) {
+    console.log('Layout Auth');
+
+    if (user) {
       prepare();
     }
-  }, [session, user, setSigned]);
+  }, [user, setSigned]);
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="index" />
+      <Stack.Screen name="sign-in" />
       <Stack.Screen name="sign-up" />
       <Stack.Screen name="forgot-password" />
     </Stack>

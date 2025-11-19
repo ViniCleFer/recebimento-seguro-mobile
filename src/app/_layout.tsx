@@ -36,11 +36,11 @@ function InitialLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={!signed}>
-        <Stack.Screen name="(auth)" />
+        <Stack.Screen name="(auth)/sign-in" />
       </Stack.Protected>
 
       <Stack.Protected guard={signed}>
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(tabs)/list" />
       </Stack.Protected>
     </Stack>
   );
@@ -55,6 +55,8 @@ export default function RootLayout() {
   // const segments = useSegments();
   // const router = useRouter();
   const { isUpdateAvailable, isDownloading } = Updates.useUpdates();
+
+  console.log('Layout App');
 
   const [appIsReady, setAppIsReady] = useState(false);
 
@@ -78,6 +80,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     async function prepare() {
+      console.log('Layout App Prepare');
+
       try {
         // Pre-load fonts, make any API calls you need to do here
         // await Font.loadAsync(FontAwesome.font);

@@ -50,7 +50,7 @@ const useAuthStore = create(
         },
       } as AuthState),
     {
-      name: 'sheUseAuthStore',
+      name: 'ptpUseAuthStore',
       storage: createJSONStorage(() => AsyncStorage),
     },
   ),

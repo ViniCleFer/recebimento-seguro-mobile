@@ -4,7 +4,7 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
 export interface UserState {
-  users: Array<Partial<User>>;
+  users: Partial<User>[];
   selectedUser: Partial<User> | null;
   setSelectedUser: (user: User) => void;
   setUsers: (users: User[]) => void;
@@ -12,7 +12,7 @@ export interface UserState {
 
 const useUserStore = create(
   persist<UserState>(
-    (set) =>
+    set =>
       ({
         users: [],
         selectedUser: null,
@@ -28,10 +28,10 @@ const useUserStore = create(
         },
       } as UserState),
     {
-      name: 'sheUseUserStore',
+      name: 'ptpUseUserStore',
       storage: createJSONStorage(() => AsyncStorage),
-    }
-  )
+    },
+  ),
 );
 
 export default useUserStore;

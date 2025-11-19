@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "safe-receipt",
+    "name": "Recebimento Seguro",
     "slug": "safe-receipt",
     "version": "1.0.45",
     "orientation": "portrait",
@@ -10,13 +10,11 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.viniciuscf.safe-receipt"
+      "bundleIdentifier": "com.viniciuscf.safereceipt",
+      "buildNumber": "3"
     },
     "android": {
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
-      ],
+      "permissions": ["android.permission.CAMERA"],
       "package": "com.viniciuscf.safereceipt",
       "versionCode": 45,
       "edgeToEdgeEnabled": true
@@ -40,9 +38,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera",
-          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone",
-          "recordAudioAndroid": true
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
         }
       ],
       [

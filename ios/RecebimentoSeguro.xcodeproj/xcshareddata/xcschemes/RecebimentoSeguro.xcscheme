@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-               BuildableName = "safereceipt.app"
-               BlueprintName = "safereceipt"
-               ReferencedContainer = "container:safereceipt.xcodeproj">
+               BuildableName = "RecebimentoSeguro.app"
+               BlueprintName = "RecebimentoSeguro"
+               ReferencedContainer = "container:RecebimentoSeguro.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "00E356ED1AD99517003FC87E"
-               BuildableName = "safereceiptTests.xctest"
-               BlueprintName = "safereceiptTests"
-               ReferencedContainer = "container:safereceipt.xcodeproj">
+               BuildableName = "RecebimentoSeguroTests.xctest"
+               BlueprintName = "RecebimentoSeguroTests"
+               ReferencedContainer = "container:RecebimentoSeguro.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -55,9 +55,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "safereceipt.app"
-            BlueprintName = "safereceipt"
-            ReferencedContainer = "container:safereceipt.xcodeproj">
+            BuildableName = "RecebimentoSeguro.app"
+            BlueprintName = "RecebimentoSeguro"
+            ReferencedContainer = "container:RecebimentoSeguro.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -72,9 +72,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "13B07F861A680F5B00A75B9A"
-            BuildableName = "safereceipt.app"
-            BlueprintName = "safereceipt"
-            ReferencedContainer = "container:safereceipt.xcodeproj">
+            BuildableName = "RecebimentoSeguro.app"
+            BlueprintName = "RecebimentoSeguro"
+            ReferencedContainer = "container:RecebimentoSeguro.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

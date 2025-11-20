@@ -2,7 +2,7 @@
   "expo": {
     "name": "Recebimento Seguro",
     "slug": "safe-receipt",
-    "version": "1.0.45",
+    "version": "1.0.46",
     "orientation": "portrait",
     "icon": "./assets/images/icon-vfcode.png",
     "scheme": "safereceipt",
@@ -11,12 +11,12 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.viniciuscf.safereceipt",
-      "buildNumber": "3"
+      "buildNumber": "4"
     },
     "android": {
       "permissions": ["android.permission.CAMERA"],
       "package": "com.viniciuscf.safereceipt",
-      "versionCode": 45,
+      "versionCode": 46,
       "edgeToEdgeEnabled": true
     },
     "web": {

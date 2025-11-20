@@ -36,11 +36,10 @@ function InitialLayout() {
   return (
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Protected guard={!signed}>
-        <Stack.Screen name="(auth)/sign-in" />
+        <Stack.Screen name="(auth)" options={{ animation: 'none' }} />
       </Stack.Protected>
-
       <Stack.Protected guard={signed}>
-        <Stack.Screen name="(tabs)/list" />
+        <Stack.Screen name="(tabs)" options={{ animation: 'none' }} />
       </Stack.Protected>
     </Stack>
   );

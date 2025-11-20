@@ -1,7 +1,15 @@
 import { FontAwesome } from '@expo/vector-icons';
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
+
+import useAuthStore from '@/store/auth';
 
 export default function MainLayout() {
+  const { signed } = useAuthStore(state => state);
+
+  if (!signed) {
+    return <Redirect href="/(auth)" />;
+  }
+
   return (
     <Tabs
       screenOptions={{

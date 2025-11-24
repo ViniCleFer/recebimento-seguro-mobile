@@ -1,55 +1,98 @@
-import { type User } from './types';
+import { supabase } from '@/lib/supabase';
+import { UserPut } from './types';
 
-export async function getUsersByCompanyIdRequest(
-  companyId: string,
-  search: string,
-  page: string,
-  size: string,
-  type: string,
+export async function getAvatarUrlRequest(avatarUrl: string) {
+  const bucketName = 'avatars';
+
+  const avatarPath = avatarUrl.split(`avatars/`)[1];
+
+  const { data } = supabase.storage.from(bucketName).getPublicUrl(avatarPath);
+
+  return { data };
+}
+
+export async function getUserProfileByIdRequest(userId: string) {
+  const { data, error, status, statusText, count } = await supabase
+    .from('users')
+    .select()
+    .eq('id', userId);
+
+  if (error) {
+    console.error(
+      'Error getUserProfileByIdRequest',
+      JSON.stringify(error, null, 2),
+    );
+    return null;
+  }
+
+  console.log(
+    'Success getUserProfileByIdRequest',
+    JSON.stringify(
+      {
+        data,
+        status,
+        statusText,
+        count,
+      },
+      null,
+      2,
+    ),
+  );
+
+  if (status === 200 && data?.length > 0) {
+    let user = data[0];
+    const avatarUrlCollection = user?.avatarUrl;
+
+    if (avatarUrlCollection) {
+      const { data } = await getAvatarUrlRequest(avatarUrlCollection);
+
+      console.log('avatar gerada', data);
+      console.log('avatar gerada', data?.publicUrl);
+
+      const avatarUrl = data?.publicUrl;
+
+      user = {
+        ...user,
+        avatarUrl,
+      };
+    }
+
+    return { data: user, status };
+  }
+
+  return { data, status };
+}
+
+export async function updateUserProfileRequest(
+  userProfileData: Partial<UserPut>,
+  userProfileId: string,
 ) {
-  // try {
-  //   const clientApi = api;
-  //   const response = await clientApi.get(`/users/company/${companyId}`, {
-  //     params: {
-  //       search,
-  //       page,
-  //       size,
-  //       type,
-  //     },
-  //   });
-  //   return response;
-  // } catch (error) {
-  //   console.error('Error getUsersByCompanyIdRequest', error);
-  //   return null;
-  // }
-}
+  const { error, data, status, statusText, count } = await supabase
+    .from('users')
+    .update(userProfileData)
+    .eq('id', userProfileId)
+    .select();
 
-export async function updateUserRequest(userId: string, user: Partial<User>) {
-  // try {
-  //   const clientApi = api;
-  //   const response = await clientApi.patch(`/users/${userId}`, {
-  //     ...user,
-  //   });
-  //   return response;
-  // } catch (error) {
-  //   console.error(
-  //     'Erro ao editar usuário, tente novamente mais tarde => ',
-  //     error,
-  //   );
-  //   return null;
-  // }
-}
+  if (error) {
+    console.error(
+      'Error updateUserProfileRequest',
+      JSON.stringify(error, null, 2),
+    );
+    return null;
+  }
+  console.log(
+    'Success updateUserProfileRequest',
+    JSON.stringify(
+      {
+        data,
+        status,
+        statusText,
+        count,
+      },
+      null,
+      2,
+    ),
+  );
 
-export async function getUserByIdRequest(userId: string) {
-  // try {
-  //   const clientApi = api;
-  //   const response = await clientApi.get(`/users/${userId}`);
-  //   return response;
-  // } catch (error) {
-  //   console.error(
-  //     'Erro ao buscar usuário, tente novamente mais tarde => ',
-  //     error,
-  //   );
-  //   return null;
-  // }
+  return { data, status };
 }

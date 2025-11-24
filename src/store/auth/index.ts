@@ -12,6 +12,7 @@ export interface AuthState {
   loading: boolean;
   user: User | null;
   setUserAuthenticated: (user: User | null, tokens: Tokens | null) => void;
+  setUser: (user: User | null) => void;
   signOut: () => void;
   setLoading: (status: boolean) => void;
   setSigned: (signed: boolean) => void;
@@ -24,6 +25,11 @@ const useAuthStore = create(
         tokens: null,
         signed: false,
         loading: false,
+        setUser: (user: User | null) => {
+          set({
+            user,
+          });
+        },
         setUserAuthenticated: (user: User | null, tokens: Tokens | null) => {
           set({
             signed: true,

@@ -232,7 +232,6 @@ const styles = StyleSheet.create({
     color: '#6b7280',
   },
   container: {
-    paddingTop: 12,
     paddingBottom: 80,
   },
   card: {

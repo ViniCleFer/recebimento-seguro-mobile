@@ -10,6 +10,8 @@ import {
   type ScrollViewProps,
 } from 'react-native';
 
+import { colors } from '@/styles/theme';
+
 import { Header } from '../Header';
 
 type ContainerProps = ScrollViewProps & {
@@ -20,6 +22,7 @@ export const ScrollScreenContainer = ({
   children,
   subtitle = '',
   style,
+  contentContainerStyle,
   ...rest
 }: ContainerProps) => {
   const { width } = Dimensions.get('window');
@@ -39,7 +42,11 @@ export const ScrollScreenContainer = ({
       >
         <ScrollView
           style={styles.scrollView}
-          contentContainerStyle={[styles.contentContainer, { maxWidth: width }]}
+          contentContainerStyle={[
+            styles.contentContainer,
+            { maxWidth: width },
+            contentContainerStyle,
+          ]}
           {...rest}
         >
           {children}
@@ -55,32 +62,20 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
   },
   subtitleContainer: {
-    backgroundColor: '#084077',
-    padding: 4,
-    minHeight: 50,
+    backgroundColor: colors.white,
+    padding: 20,
     justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    zIndex: 999,
   },
   subtitleText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 18,
-    textAlign: 'center',
+    color: colors.primary,
+    fontWeight: '700',
+    fontSize: 22,
   },
   scrollView: {
     flex: 1,
   },
   contentContainer: {
-    backgroundColor: 'white',
+    backgroundColor: colors.white,
     padding: 10,
   },
 });

@@ -1,5 +1,6 @@
 import { MaterialIcons } from '@expo/vector-icons';
 import { useNavigationState } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
 import {
   Alert,
@@ -14,8 +15,10 @@ import {
 
 // import LogoYpe from '@/assets/ype.png';
 import { supabase } from '@/lib/supabase';
+
 import useAuthStore from '@/store/auth';
-import { useRouter } from 'expo-router';
+
+import { colors } from '@/styles/theme';
 // import useFactoryPlantStore from '../../store/factories';
 
 interface HeaderProps extends ViewProps {
@@ -81,7 +84,7 @@ export const Header = ({ zIndex = 1, style, ...rest }: HeaderProps) => {
             <MaterialIcons
               name={'arrow-back-ios'}
               size={20}
-              color={'#bdbdbd'}
+              color={colors.white}
             />
           </TouchableOpacity>
         )}
@@ -122,7 +125,7 @@ export const Header = ({ zIndex = 1, style, ...rest }: HeaderProps) => {
       </View>
 
       <TouchableOpacity style={styles.logoutButton} onPress={signOut}>
-        <MaterialIcons name="logout" color={'#084077'} size={28} />
+        <MaterialIcons name="logout" color={colors.white} size={28} />
       </TouchableOpacity>
     </View>
   );
@@ -130,13 +133,13 @@ export const Header = ({ zIndex = 1, style, ...rest }: HeaderProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: colors.primary,
     paddingLeft: 14,
     paddingRight: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    paddingBottom: 8,
   },
   leftSection: {
     flexDirection: 'row',
@@ -153,6 +156,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '500',
     textTransform: 'capitalize',
+    color: colors.white,
   },
   userSection: {
     width: '75%',

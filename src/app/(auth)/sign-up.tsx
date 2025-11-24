@@ -161,12 +161,7 @@ export default function SignUp() {
         style={[styles.signUpButton, isLoading && styles.disabledButton]}
       />
 
-      <TouchableOpacity
-        onPress={() => {
-          router.navigate('/');
-        }}
-        style={styles.linkButton}
-      >
+      <TouchableOpacity onPress={() => router.back()} style={styles.linkButton}>
         <Text style={styles.linkText}>Voltar para o login</Text>
       </TouchableOpacity>
 

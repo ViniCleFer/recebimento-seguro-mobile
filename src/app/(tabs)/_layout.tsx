@@ -36,6 +36,15 @@ export default function MainLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="(profile)"
+        options={{
+          title: 'Perfil',
+          tabBarIcon: ({ color }) => (
+            <FontAwesome name="user" size={24} color={color} />
+          ),
+        }}
+      />
     </Tabs>
   );
 }

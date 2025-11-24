@@ -86,7 +86,7 @@ export default function RootLayout() {
         // await Font.loadAsync(FontAwesome.font);
         // Artificially delay for two seconds to simulate a slow loading
         // experience. Remove this if you copy and paste the code!
-        await new Promise(resolve => setTimeout(resolve, 5000));
+        await new Promise(resolve => setTimeout(resolve, 3000));
 
         // return Alert.alert('Iniciando o App', 'O app está sendo carregado');
       } catch (e) {
@@ -118,7 +118,7 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <StatusBar backgroundColor="white" barStyle="dark-content" translucent />
+      <StatusBar barStyle="light-content" translucent />
       <View style={{ flex: 1 }}>
         <InitialLayout />
       </View>

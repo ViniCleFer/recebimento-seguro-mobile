@@ -2,29 +2,25 @@ export interface User {
   id: string;
   name: string;
   email: string;
-  doc?: string | null;
-  phone?: string | null;
-  avatar_url?: string | null;
-  linkedIn?: string | null;
-  companies?: any[];
-  companies_ids?: string[];
-  status: 'US1' | 'US2' | 'US3';
-  hashedRefreshToken: string | null;
+  status: boolean;
   profile: 'ADMIN' | 'MEMBER';
   permissions: 'WEB' | 'MOBILE';
+  avatarUrl: string | null;
   created_at: Date;
-  updated_at: Date;
-  canceled_at: Date;
+  updated_at: Date | null;
+  canceled_at: Date | null;
 }
 
-export interface Guest extends Omit<User, 'profile'> {
-  profile: 'GS1' | 'GS2';
+export interface UserPost {
+  name: string;
+  email: string;
+  status: boolean;
+  profile: 'ADMIN' | 'MEMBER';
+  permissions: 'WEB' | 'MOBILE';
+  avatarUrl: string | null;
+  canceled_at: Date | null;
 }
 
-export interface GuestToSelectNote extends Guest {
-  selectedNote: boolean;
-}
-
-export interface GuestToSelect extends Guest {
-  selected: boolean;
+export interface UserPut extends UserPost {
+  id: string;
 }

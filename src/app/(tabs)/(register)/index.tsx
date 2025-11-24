@@ -8,12 +8,14 @@ import { ScrollScreenContainer } from '@/components/ScrollScreenContainer';
 import { colors } from '@/styles/theme';
 
 const styles = StyleSheet.create({
+  container: {
+    gap: 18,
+  },
   card: {
     backgroundColor: colors.white,
     borderRadius: 14,
     borderWidth: 1,
     borderColor: colors.gray300,
-    marginBottom: 18,
     minHeight: 68,
     justifyContent: 'center',
     paddingVertical: 10,
@@ -54,7 +56,7 @@ export default function SelectFormType() {
   }, [navigate]);
 
   return (
-    <ScrollScreenContainer subtitle="Selecione o tipo de formulário">
+    <ScrollScreenContainer contentContainerStyle={styles.container}>
       <TouchableOpacity
         onPress={handleCreateFormPtp}
         style={styles.card}

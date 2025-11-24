@@ -293,7 +293,6 @@ export default function CartaControleList() {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 12,
     paddingBottom: 80,
   },
   card: {

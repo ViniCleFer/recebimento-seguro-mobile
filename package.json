@@ -42,6 +42,7 @@
     "expo-web-browser": "~15.0.8",
     "intl": "^1.2.5",
     "mime": "^4.0.7",
+    "lucide-react-native": "^0.475.0",
     "polished": "^4.3.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",

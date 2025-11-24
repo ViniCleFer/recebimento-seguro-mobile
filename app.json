@@ -38,7 +38,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera"
+          "cameraPermission": "O App $(PRODUCT_NAME) quer acessar sua câmera"
         }
       ],
       [
